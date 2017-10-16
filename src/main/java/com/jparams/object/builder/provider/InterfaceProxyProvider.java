@@ -5,35 +5,30 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
 
-import com.jparams.object.builder.factory.ObjectFactory;
-import com.jparams.object.builder.path.Path;
-import com.jparams.object.builder.path.PathFactory;
 import com.jparams.object.builder.provider.context.ProviderContext;
 
 public class InterfaceProxyProvider implements Provider
 {
-    @Override
-    public Object provide(final ProviderContext providerContext)
-    {
-        final InvocationHandler invocationHandler = new ResponseBuildingInvocationHandler(objectFactory, path);
-        return Proxy.newProxyInstance(path.getType().getClassLoader(), new Class<?>[]{path.getType()}, invocationHandler);
-    }
-
     @Override
     public boolean supports(final Class<?> clazz)
     {
         return clazz.isInterface();
     }
 
+    @Override
+    public Object provide(final ProviderContext context)
+    {
+        final InvocationHandler invocationHandler = new ResponseBuildingInvocationHandler(context);
+        return Proxy.newProxyInstance(context.getPath().getType().getClassLoader(), new Class<?>[]{context.getPath().getType()}, invocationHandler);
+    }
+
     private static class ResponseBuildingInvocationHandler implements InvocationHandler
     {
-        private final ObjectFactory objectFactory;
-        private final Path path;
+        private final ProviderContext context;
 
-        ResponseBuildingInvocationHandler(final ObjectFactory objectFactory, final Path path)
+        ResponseBuildingInvocationHandler(final ProviderContext context)
         {
-            this.objectFactory = objectFactory;
-            this.path = path;
+            this.context = context;
         }
 
         @Override
@@ -45,7 +40,7 @@ public class InterfaceProxyProvider implements Provider
             }
 
             final String methodName = String.format("%s(%s", method.getName(), Arrays.toString(args));
-            return objectFactory.create(PathFactory.createPath(methodName, method.getReturnType(), path));
+            return context.createChild(methodName, method.getReturnType());
         }
     }
 }

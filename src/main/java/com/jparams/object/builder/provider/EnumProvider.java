@@ -6,17 +6,18 @@ import com.jparams.object.builder.provider.context.ProviderContext;
 
 public class EnumProvider implements Provider
 {
-    private final Random random;
+    private final Random random = new Random();
 
-    public EnumProvider()
+    @Override
+    public boolean supports(final Class<?> clazz)
     {
-        random = new Random();
+        return clazz.isEnum();
     }
 
     @Override
-    public Enum provide(final ProviderContext providerContext)
+    public Enum provide(final ProviderContext context)
     {
-        final Class<?> type = path.getType();
+        final Class<?> type = context.getPath().getType();
         final int valueCount = type.getEnumConstants().length;
 
         if (valueCount > 0)
@@ -28,9 +29,4 @@ public class EnumProvider implements Provider
         return null;
     }
 
-    @Override
-    public boolean supports(final Class<?> clazz)
-    {
-        return clazz.isEnum();
-    }
 }

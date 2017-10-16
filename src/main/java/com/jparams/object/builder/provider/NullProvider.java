@@ -1,12 +1,21 @@
 package com.jparams.object.builder.provider;
 
+import com.jparams.object.builder.path.Path;
 import com.jparams.object.builder.provider.context.ProviderContext;
 
 public class NullProvider implements Provider
 {
     @Override
-    public Object provide(final ProviderContext providerContext)
+    public boolean supports(final Class<?> clazz)
     {
+        return true;
+    }
+
+    @Override
+    public Object provide(final ProviderContext context)
+    {
+        final Path path = context.getPath();
+
         if (path.getType() == byte.class)
         {
             return (byte) 0;
@@ -48,11 +57,5 @@ public class NullProvider implements Provider
         }
 
         return null;
-    }
-
-    @Override
-    public boolean supports(final Class<?> clazz)
-    {
-        return true;
     }
 }

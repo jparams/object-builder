@@ -1,5 +1,7 @@
 package com.jparams.object.builder.provider.context;
 
+import java.util.Arrays;
+
 import com.jparams.object.builder.factory.ObjectFactory;
 import com.jparams.object.builder.path.Path;
 
@@ -19,8 +21,9 @@ public class ProviderContext
         return path;
     }
 
-    public ObjectFactory getObjectFactory()
+    public Object createChild(final String name, final Class<?> type, final Class<?>... genericTypes)
     {
-        return objectFactory;
+        final Path childPath = new Path(name, type, Arrays.asList(genericTypes), this.path);
+        return objectFactory.create(childPath);
     }
 }

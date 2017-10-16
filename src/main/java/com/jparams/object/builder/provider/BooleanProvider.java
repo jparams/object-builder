@@ -9,14 +9,14 @@ public class BooleanProvider implements Provider
     private final Random random = new Random();
 
     @Override
-    public Boolean provide(final ProviderContext providerContext)
-    {
-        return random.nextBoolean();
-    }
-
-    @Override
     public boolean supports(final Class<?> clazz)
     {
         return clazz.isAssignableFrom(Boolean.class) || clazz.isAssignableFrom(boolean.class);
+    }
+
+    @Override
+    public Boolean provide(final ProviderContext context)
+    {
+        return random.nextBoolean();
     }
 }

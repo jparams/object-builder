@@ -5,6 +5,7 @@ import java.util.List;
 import com.jparams.object.builder.path.Path;
 import com.jparams.object.builder.path.PathFilter;
 import com.jparams.object.builder.provider.Provider;
+import com.jparams.object.builder.provider.context.ProviderContext;
 
 public class ObjectFactory
 {
@@ -27,14 +28,16 @@ public class ObjectFactory
     @SuppressWarnings("unchecked")
     public <T> T create(final Path path)
     {
+        final ProviderContext context = new ProviderContext(path, this);
+
         if (path.getDepth() > maxDepth || !pathFilter.accept(path))
         {
-            return (T) nullProvider.provide(path);
+            return (T) nullProvider.provide(context);
         }
 
         return (T) providers.stream()
                             .filter(provider -> provider.supports(path.getType()))
-                            .map(provider -> provider.provide(path))
+                            .map(provider -> provider.provide(context))
                             .findFirst()
                             .orElse(null);
     }

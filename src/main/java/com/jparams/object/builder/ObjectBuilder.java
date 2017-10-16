@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.jparams.object.builder.factory.ObjectFactory;
 import com.jparams.object.builder.path.Path;
-import com.jparams.object.builder.path.PathFactory;
 import com.jparams.object.builder.path.PathFilter;
 import com.jparams.object.builder.provider.ArrayProvider;
 import com.jparams.object.builder.provider.BigDecimalProvider;
@@ -116,8 +115,8 @@ public class ObjectBuilder
     public <T> T buildInstanceOf(final Class<T> clazz)
     {
         final ObjectFactory objectFactory = new ObjectFactory(getProviders(), nullProvider, pathFilter, maxDepth);
-        final Path rootPath = PathFactory.createRootPath(clazz);
-        return objectFactory.create(rootPath);
+        final Path path = new Path("$", clazz, Collections.emptyList(), null);
+        return objectFactory.create(path);
     }
 
     public static ObjectBuilder newBuilder()
