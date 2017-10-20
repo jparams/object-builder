@@ -1,5 +1,6 @@
 package com.jparams.object.builder.path;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +17,7 @@ public class Path
         this.name = name;
         this.type = type;
         this.parent = parent;
-        this.generics = Collections.unmodifiableList(generics);
+        this.generics = generics == null ? Collections.emptyList() : Collections.unmodifiableList(new ArrayList<>(generics));
     }
 
     public String getName()
@@ -73,5 +74,18 @@ public class Path
     public int hashCode()
     {
         return Objects.hash(name, type, parent, generics);
+    }
+
+    @Override
+    public String toString()
+    {
+        if (parent == null)
+        {
+            return name;
+        }
+        else
+        {
+            return parent.toString() + "." + name;
+        }
     }
 }

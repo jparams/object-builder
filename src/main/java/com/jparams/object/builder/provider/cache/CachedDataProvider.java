@@ -25,23 +25,21 @@ public class CachedDataProvider implements Provider
     @Override
     public Object provide(final ProviderContext context)
     {
-        if (context.getPath().getDepth() < cacheStart)
+        if (!cache.containsKey(context.getPath()) || context.getPath().getDepth() < cacheStart)
         {
             final Optional<Provider> provider = findSupportingProvider(context.getPath().getType());
 
             if (provider.isPresent())
             {
                 final Object obj = provider.get().provide(context);
-                cache.put(context.getPath(), provider);
+                cache.put(context.getPath(), obj);
                 return obj;
             }
-        }
-        else
-        {
-            return cache.get(context.getPath());
+
+            return null;
         }
 
-        return null;
+        return cache.get(context.getPath());
     }
 
     @Override

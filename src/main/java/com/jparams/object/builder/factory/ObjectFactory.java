@@ -35,10 +35,17 @@ public class ObjectFactory
             return (T) nullProvider.provide(context);
         }
 
-        return (T) providers.stream()
-                            .filter(provider -> provider.supports(path.getType()))
-                            .map(provider -> provider.provide(context))
-                            .findFirst()
-                            .orElse(null);
+        try
+        {
+            return (T) providers.stream()
+                                .filter(provider -> provider.supports(path.getType()))
+                                .map(provider -> provider.provide(context))
+                                .findFirst()
+                                .orElse(nullProvider.provide(context));
+        }
+        catch (final Exception e)
+        {
+            return (T) nullProvider.provide(context);
+        }
     }
 }
