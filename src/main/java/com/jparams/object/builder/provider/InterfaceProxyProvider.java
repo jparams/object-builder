@@ -6,6 +6,8 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 
 import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.MemberTypeResolver;
 
 public class InterfaceProxyProvider implements Provider
 {
@@ -19,7 +21,8 @@ public class InterfaceProxyProvider implements Provider
     public Object provide(final ProviderContext context)
     {
         final InvocationHandler invocationHandler = new ResponseBuildingInvocationHandler(context);
-        return Proxy.newProxyInstance(context.getPath().getType().getClassLoader(), new Class<?>[]{context.getPath().getType()}, invocationHandler);
+        final Class<?> type = context.getPath().getMemberType().getType();
+        return Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[]{type}, invocationHandler);
     }
 
     private static class ResponseBuildingInvocationHandler implements InvocationHandler
@@ -34,13 +37,15 @@ public class InterfaceProxyProvider implements Provider
         @Override
         public Object invoke(final Object proxy, final Method method, final Object[] args)
         {
-            if (method.getReturnType().equals(Void.TYPE))
+            final String methodName = String.format("%s(%s", method.getName(), Arrays.toString(args));
+            final MemberType memberType = MemberTypeResolver.resolve(method);
+
+            if (memberType == null)
             {
                 return null;
             }
 
-            final String methodName = String.format("%s(%s", method.getName(), Arrays.toString(args));
-            return context.createChild(methodName, method.getReturnType());
+            return context.createChild(methodName, memberType);
         }
     }
 }

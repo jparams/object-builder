@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Random;
 
 import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.type.MemberType;
 
 public class MapProvider implements Provider
 {
@@ -20,14 +21,14 @@ public class MapProvider implements Provider
     @Override
     public Map<?, ?> provide(final ProviderContext context)
     {
-        if (context.getPath().getGenerics().size() < 2)
+        if (context.getPath().getMemberType().getGenerics().size() < 2)
         {
             return Collections.emptyMap();
         }
 
         final Map<Object, Object> map = new HashMap<>();
-        final Class<?> keyType = context.getPath().getGenerics().get(0);
-        final Class<?> valueType = context.getPath().getGenerics().get(1);
+        final MemberType keyType = context.getPath().getMemberType().getGenerics().get(0);
+        final MemberType valueType = context.getPath().getMemberType().getGenerics().get(1);
 
         for (int i = 0; i < randomSize(); i++)
         {

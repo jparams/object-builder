@@ -7,9 +7,16 @@ import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.jparams.object.builder.model.MyEmptyEnum;
+import com.jparams.object.builder.model.MyEnum;
 import com.jparams.object.builder.model.MyInterface;
 import com.jparams.object.builder.model.MyModel;
+import com.jparams.object.builder.model.MyModel2;
+import com.jparams.object.builder.model.MyModel3;
+import com.jparams.object.builder.provider.Provider;
+import com.jparams.object.builder.provider.context.ProviderContext;
 import com.jparams.object.builder.type.TypeReference;
 
 import org.junit.Before;
@@ -266,5 +273,104 @@ public class ObjectBuilderTest
         });
 
         assertThat(values).isNotEmpty();
+    }
+
+    @Test
+    public void createsEnum()
+    {
+        final MyEnum value = subject.buildInstanceOf(MyEnum.class);
+        assertThat(value).isNotNull();
+    }
+
+    @Test
+    public void createsNullEnumWhenNoValuesAvailable()
+    {
+        final MyEmptyEnum value = subject.buildInstanceOf(MyEmptyEnum.class);
+        assertThat(value).isNull();
+    }
+
+    @Test
+    public void createsNullValueWhenDepthExhausted()
+    {
+        final Configuration configuration = new Configuration().withMaxDepth(-1);
+        final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
+
+        assertThat(subject.buildInstanceOf(String.class)).isNull();
+        assertThat(subject.buildInstanceOf(byte.class)).isEqualTo((byte) 0);
+        assertThat(subject.buildInstanceOf(short.class)).isEqualTo((short) 0);
+        assertThat(subject.buildInstanceOf(int.class)).isEqualTo(0);
+        assertThat(subject.buildInstanceOf(long.class)).isEqualTo((long) 0);
+        assertThat(subject.buildInstanceOf(float.class)).isEqualTo((float) 0.0);
+        assertThat(subject.buildInstanceOf(double.class)).isEqualTo((double) 0.0);
+        assertThat(subject.buildInstanceOf(boolean.class)).isEqualTo(false);
+        assertThat(subject.buildInstanceOf(char.class)).isEqualTo('\u0000');
+    }
+
+    @Test
+    public void createsEmptySetWhenGenericsNotKnown()
+    {
+        final Set values = subject.buildInstanceOf(new TypeReference<Set>()
+        {
+        });
+        assertThat(values).isEmpty();
+    }
+
+    @Test
+    public void createsShort()
+    {
+        final Short value = subject.buildInstanceOf(Short.class);
+        assertThat(value).isNotNull();
+    }
+
+    @Test
+    public void createsShortPrimitive()
+    {
+        final short value = subject.buildInstanceOf(short.class);
+        assertThat(value).isNotNull();
+    }
+
+    @Test
+    public void createsNullOnException()
+    {
+        final MyModel3 value = subject.buildInstanceOf(MyModel3.class);
+        assertThat(value).isNull();
+    }
+
+    @Test
+    public void createsNullWhenPathIsFilteredOut()
+    {
+        final Configuration configuration = new Configuration().withDefaultProviders()
+                                                               .withPathFilter((path) -> !path.getName().equals("field4"));
+
+        final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
+
+        final MyModel myModel = subject.buildInstanceOf(MyModel.class);
+        assertThat(myModel).isNotNull();
+        assertThat(myModel.getField4()).isNull();
+    }
+
+    @Test
+    public void createsDataFromCustomeProvider()
+    {
+        final MyModel2 myModel2 = new MyModel2();
+        final Configuration configuration = new Configuration().withDefaultProviders()
+                                                               .withProvider(new Provider()
+                                                               {
+                                                                   @Override
+                                                                   public boolean supports(final Class<?> clazz)
+                                                                   {
+                                                                       return clazz == MyModel2.class;
+                                                                   }
+
+                                                                   @Override
+                                                                   public Object provide(final ProviderContext context)
+                                                                   {
+                                                                       return myModel2;
+                                                                   }
+                                                               });
+
+        final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
+
+        assertThat(subject.buildInstanceOf(MyModel2.class)).isSameAs(myModel2);
     }
 }

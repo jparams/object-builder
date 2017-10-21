@@ -17,7 +17,7 @@ public class EnumProvider implements Provider
     @Override
     public Enum provide(final ProviderContext context)
     {
-        final Class<?> type = context.getPath().getType();
+        final Class<?> type = context.getPath().getMemberType().getType();
         final int valueCount = type.getEnumConstants().length;
 
         if (valueCount > 0)

@@ -4,6 +4,8 @@ import java.lang.reflect.Array;
 import java.util.Random;
 
 import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.MemberTypeResolver;
 
 public class ArrayProvider implements Provider
 {
@@ -18,12 +20,13 @@ public class ArrayProvider implements Provider
     @Override
     public Object[] provide(final ProviderContext context)
     {
-        final Class<?> type = context.getPath().getType().getComponentType();
-        final Object[] array = (Object[]) Array.newInstance(type, randomSize());
+        final Class<?> componentType = context.getPath().getMemberType().getType().getComponentType();
+        final MemberType memberType = MemberTypeResolver.resolve(componentType);
+        final Object[] array = (Object[]) Array.newInstance(componentType, randomSize());
 
         for (int i = 0; i < array.length; i++)
         {
-            array[i] = context.createChild("[" + i + "]", type);
+            array[i] = context.createChild("[" + i + "]", memberType);
         }
 
         return array;

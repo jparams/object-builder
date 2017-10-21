@@ -1,11 +1,9 @@
 package com.jparams.object.builder.type;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.Arrays;
-import java.util.Collections;
+import java.lang.reflect.Type;
 
 import com.jparams.object.builder.path.Path;
-import com.jparams.object.builder.util.ReflectionUtils;
 
 public abstract class TypeReference<T> implements Comparable<T>
 {
@@ -25,22 +23,12 @@ public abstract class TypeReference<T> implements Comparable<T>
     {
         if (typeReference.getClass().getGenericSuperclass() instanceof ParameterizedType)
         {
-            final ParameterizedType superClass = (ParameterizedType) typeReference.getClass().getGenericSuperclass();
+            final Type[] types = ((ParameterizedType) typeReference.getClass().getGenericSuperclass()).getActualTypeArguments();
 
-            if (superClass.getActualTypeArguments().length > 0)
+            if (types.length > 0)
             {
-                if (superClass.getActualTypeArguments()[0] instanceof ParameterizedType)
-                {
-                    final ParameterizedType parameterizedType = (ParameterizedType) superClass.getActualTypeArguments()[0];
-                    final Class<?>[] generics = ReflectionUtils.getGenerics(parameterizedType);
-
-                    return new Path("$", (Class<?>) parameterizedType.getRawType(), Arrays.asList(generics), null);
-                }
-
-                if (superClass.getActualTypeArguments()[0] instanceof Class)
-                {
-                    return new Path("$", (Class<?>) superClass.getActualTypeArguments()[0], Collections.emptyList(), null);
-                }
+                final MemberType memberType = MemberTypeResolver.resolve(types[0]);
+                return new Path("$", memberType, null);
             }
         }
 

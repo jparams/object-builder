@@ -27,7 +27,7 @@ public class CachedDataProvider implements Provider
     {
         if (!cache.containsKey(context.getPath()) || context.getPath().getDepth() < cacheStart)
         {
-            final Optional<Provider> provider = findSupportingProvider(context.getPath().getType());
+            final Optional<Provider> provider = findSupportingProvider(context.getPath().getMemberType().getType());
 
             if (provider.isPresent())
             {

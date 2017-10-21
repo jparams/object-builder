@@ -38,7 +38,7 @@ public class ObjectFactory
         try
         {
             return (T) providers.stream()
-                                .filter(provider -> provider.supports(path.getType()))
+                                .filter(provider -> provider.supports(path.getMemberType().getType()))
                                 .map(provider -> provider.provide(context))
                                 .findFirst()
                                 .orElse(nullProvider.provide(context));

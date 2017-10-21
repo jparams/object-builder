@@ -1,6 +1,5 @@
 package com.jparams.object.builder.provider;
 
-import com.jparams.object.builder.path.Path;
 import com.jparams.object.builder.provider.context.ProviderContext;
 
 public class NullProvider implements Provider
@@ -14,44 +13,44 @@ public class NullProvider implements Provider
     @Override
     public Object provide(final ProviderContext context)
     {
-        final Path path = context.getPath();
+        final Class<?> type = context.getPath().getMemberType().getType();
 
-        if (path.getType() == byte.class)
+        if (type == byte.class)
         {
             return (byte) 0;
         }
 
-        if (path.getType() == short.class)
+        if (type == short.class)
         {
             return (short) 0;
         }
 
-        if (path.getType() == int.class)
+        if (type == int.class)
         {
             return 0;
         }
 
-        if (path.getType() == long.class)
+        if (type == long.class)
         {
             return 0L;
         }
 
-        if (path.getType() == float.class)
+        if (type == float.class)
         {
             return 0.0f;
         }
 
-        if (path.getType() == double.class)
+        if (type == double.class)
         {
             return 0.0d;
         }
 
-        if (path.getType() == boolean.class)
+        if (type == boolean.class)
         {
             return false;
         }
 
-        if (path.getType() == char.class)
+        if (type == char.class)
         {
             return '\u0000';
         }

@@ -1,23 +1,20 @@
 package com.jparams.object.builder.path;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
+
+import com.jparams.object.builder.type.MemberType;
 
 public class Path
 {
     private final String name;
-    private final Class<?> type;
+    private final MemberType memberType;
     private final Path parent;
-    private final List<Class<?>> generics;
 
-    public Path(final String name, final Class<?> type, final List<Class<?>> generics, final Path parent)
+    public Path(final String name, final MemberType memberType, final Path parent)
     {
         this.name = name;
-        this.type = type;
+        this.memberType = memberType;
         this.parent = parent;
-        this.generics = generics == null ? Collections.emptyList() : Collections.unmodifiableList(new ArrayList<>(generics));
     }
 
     public String getName()
@@ -25,19 +22,14 @@ public class Path
         return name;
     }
 
-    public Class<?> getType()
+    public MemberType getMemberType()
     {
-        return type;
+        return memberType;
     }
 
     public Path getParent()
     {
         return parent;
-    }
-
-    public List<Class<?>> getGenerics()
-    {
-        return generics;
     }
 
     public int getDepth()
@@ -65,15 +57,14 @@ public class Path
 
         final Path path = (Path) o;
         return Objects.equals(name, path.name)
-            && Objects.equals(type, path.type)
-            && Objects.equals(parent, path.parent)
-            && Objects.equals(generics, path.generics);
+            && Objects.equals(memberType, path.memberType)
+            && Objects.equals(parent, path.parent);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(name, type, parent, generics);
+        return Objects.hash(name, memberType, parent);
     }
 
     @Override

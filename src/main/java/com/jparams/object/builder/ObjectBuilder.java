@@ -1,9 +1,9 @@
 package com.jparams.object.builder;
 
-import java.util.Collections;
-
 import com.jparams.object.builder.factory.ObjectFactory;
 import com.jparams.object.builder.path.Path;
+import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.MemberTypeResolver;
 import com.jparams.object.builder.type.TypeReference;
 
 public class ObjectBuilder
@@ -17,7 +17,8 @@ public class ObjectBuilder
 
     public <T> T buildInstanceOf(final Class<T> clazz)
     {
-        final Path path = new Path("$", clazz, Collections.emptyList(), null);
+        final MemberType memberType = MemberTypeResolver.resolve(clazz);
+        final Path path = new Path("$", memberType, null);
         return objectFactory.create(path);
     }
 

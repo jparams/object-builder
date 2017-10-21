@@ -44,7 +44,7 @@ public class Configuration
         this.providers = new ArrayList<>();
         this.pathFilter = (path) -> true;
         this.nullProvider = new NullProvider();
-        this.maxDepth = 10;
+        this.maxDepth = 15;
         this.caching = false;
         this.cacheStart = 0;
     }

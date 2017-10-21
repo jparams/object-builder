@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.type.MemberType;
 
 public class ListProvider implements Provider
 {
@@ -20,17 +21,17 @@ public class ListProvider implements Provider
     @Override
     public List<?> provide(final ProviderContext context)
     {
-        if (context.getPath().getGenerics().isEmpty())
+        if (context.getPath().getMemberType().getGenerics().isEmpty())
         {
             return Collections.emptyList();
         }
 
         final List<Object> list = new ArrayList<>();
-        final Class<?> type = context.getPath().getGenerics().get(0);
+        final MemberType memberType = context.getPath().getMemberType().getGenerics().get(0);
 
         for (int i = 0; i < randomSize(); i++)
         {
-            final Object child = context.createChild("[" + i + "]", type);
+            final Object child = context.createChild("[" + i + "]", memberType);
             list.add(child);
         }
 

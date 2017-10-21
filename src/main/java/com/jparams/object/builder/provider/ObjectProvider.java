@@ -12,7 +12,8 @@ import java.util.stream.Collectors;
 
 import com.jparams.object.builder.path.Path;
 import com.jparams.object.builder.provider.context.ProviderContext;
-import com.jparams.object.builder.util.ReflectionUtils;
+import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.MemberTypeResolver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,7 @@ public class ObjectProvider implements Provider
     @Override
     public Object provide(final ProviderContext context)
     {
-        final List<Constructor<?>> constructors = getAllConstructors(context.getPath().getType());
+        final List<Constructor<?>> constructors = getAllConstructors(context.getPath().getMemberType().getType());
 
         for (final Constructor<?> constructor : constructors)
         {
@@ -49,13 +50,14 @@ public class ObjectProvider implements Provider
 
     private Object createInstance(final Path path, final Constructor<?> constructor, final ProviderContext context)
     {
-        final String name = String.format("%s(%s)", context.getPath().getType().getSimpleName(), ReflectionUtils.getParametersString(constructor));
+        final String name = String.format("%s(%s)", context.getPath().getMemberType().getType().getSimpleName(), getParametersString(constructor));
         final Object[] arguments = new Object[constructor.getParameters().length];
 
         for (int i = 0; i < constructor.getParameters().length; i++)
         {
             final Parameter parameter = constructor.getParameters()[i];
-            arguments[i] = context.createChild(name + "[" + i + "]", parameter.getType(), ReflectionUtils.getGenerics(parameter));
+            final MemberType memberType = MemberTypeResolver.resolve(parameter);
+            arguments[i] = context.createChild(name + "[" + i + "]", memberType);
         }
 
         try
@@ -64,7 +66,7 @@ public class ObjectProvider implements Provider
         }
         catch (InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e)
         {
-            LOG.trace("Failed to createRootPath instance of [{}] at path [{}]. Failed with exception", path.getType(), path.getLocation(), e);
+            LOG.trace("Failed to createRootPath instance of [{}] at path [{}]. Failed with exception", path.getMemberType(), path.getLocation(), e);
             return null;
         }
     }
@@ -79,7 +81,8 @@ public class ObjectProvider implements Provider
             {
                 if (!Modifier.isFinal(field.getModifiers()))
                 {
-                    final Object instance = context.createChild(field.getName(), field.getType(), ReflectionUtils.getGenerics(field));
+                    final MemberType memberType = MemberTypeResolver.resolve(field);
+                    final Object instance = context.createChild(field.getName(), memberType);
 
                     try
                     {
@@ -89,7 +92,7 @@ public class ObjectProvider implements Provider
                     catch (final IllegalAccessException e)
                     {
                         final Path path = context.getPath();
-                        LOG.trace("Failed to instance of [{}] at path [{}]. Failed with exception", path.getType(), path.getLocation(), e);
+                        LOG.trace("Failed to instance of [{}] at path [{}]. Failed with exception", path.getMemberType(), path.getLocation(), e);
                     }
                 }
             }
@@ -110,5 +113,13 @@ public class ObjectProvider implements Provider
                      .sorted(Comparator.comparingInt(Constructor::getParameterCount))
                      .peek(constructor -> constructor.setAccessible(true))
                      .collect(Collectors.toList());
+    }
+
+    public static String getParametersString(final Constructor<?> constructor)
+    {
+        return Arrays.stream(constructor.getParameters())
+                     .map(param -> param.getType().getSimpleName() + " " + param.getName())
+                     .reduce((item1, item2) -> item1 + ", " + item2)
+                     .orElse("");
     }
 }
