@@ -19,6 +19,10 @@ version = '1.0.1'
 
 sourceCompatibility = 1.8
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.25'
 

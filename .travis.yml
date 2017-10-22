@@ -2,8 +2,8 @@ language: java
 jdk:
 - oraclejdk8
 script:
-- "./gradlew clean build uploadArchives -PnexusUsername=$NEXUS_USERNAME -PnexusPassword=$NEXUS_PASSWORD
-  -Psigning.keyId=$SIGNING_KEY -Psigning.password=$SIGNING_PASSWORD -Psigning.secretKeyRingFile=key.gpg"
+- ./gradlew clean build uploadArchives -PnexusUsername=$NEXUS_USERNAME -PnexusPassword=$NEXUS_PASSWORD
+  -Psigning.keyId=$SIGNING_KEY -Psigning.password=$SIGNING_PASSWORD -Psigning.secretKeyRingFile=key.gpg
 env:
   global:
   - secure: KNt3OUrY37kLWdVh4hwlONtLzt4rrMuONBshj8nTdOqoEVOSXZ7Mci68zDr54L6wXniCRUWXXHBSdA5unn8QCSiQ4e9jfBbEsozrGlxOGHqC+DaUo2kwyRey7nvhrRCfsiRND/3b+uHVFJkPlsbQaNHrrnA75E/YtnwfAG44TlFa6Rk4GzK8/7ks11FyiGZh2t+Uzsvl7JE0HHb6NDZc7eAtyQ4Z71qiGcu9yhgkcUxeGxk2m9XXYGpnmWqtHocQNtxr8mQWHWHi4em+pmuvmaamCWWPQozZPXPMzIq9Pq32wNNUfeIZsIIWjLY5SrD+qs7FhApNOK82d7lkHXwv9rsCapzcGdWcjj9aAv0sqAliD+yYUmUQiGFEB28aWqylg+uWS+N2NiZA0NuuxuUBzGm52lJiZzMwgxJT8fZFdPQhex/7GBNzeJZqOkMdyQqPDX0mMFG9XVagO80R1nVLMp9+DpjlmvGM4VP3xFlghWLdSr5KiSpwEc7zwBfv/4xw008SGTuLuwZZkuULrZgi0OjMlXF7Rs28VGtzfe1qy2kkrUj+QzgD0rcoDRMjKLQlYy3hsNCDOgaPVjyWn03hRBKSDFf/ircKsKsfAED9r8gucolWipKGXzfnxHekopyFZZImYMjsyL5pClkcGERESox/NIF/9ICxj6UzQw4zSKQ=
