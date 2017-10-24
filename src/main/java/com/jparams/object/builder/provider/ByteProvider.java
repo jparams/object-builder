@@ -2,7 +2,7 @@ package com.jparams.object.builder.provider;
 
 import java.util.Random;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 
 public class ByteProvider implements Provider
 {
@@ -15,7 +15,7 @@ public class ByteProvider implements Provider
     }
 
     @Override
-    public Byte provide(final ProviderContext context)
+    public Byte provide(final Context context)
     {
         return (byte) random.nextInt(Byte.MAX_VALUE);
     }

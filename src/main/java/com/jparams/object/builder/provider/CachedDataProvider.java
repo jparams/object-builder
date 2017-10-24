@@ -1,4 +1,4 @@
-package com.jparams.object.builder.provider.cache;
+package com.jparams.object.builder.provider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.jparams.object.builder.Context;
 import com.jparams.object.builder.path.Path;
-import com.jparams.object.builder.provider.Provider;
-import com.jparams.object.builder.provider.context.ProviderContext;
 
 public class CachedDataProvider implements Provider
 {
@@ -23,7 +22,7 @@ public class CachedDataProvider implements Provider
     }
 
     @Override
-    public Object provide(final ProviderContext context)
+    public Object provide(final Context context)
     {
         if (!cache.containsKey(context.getPath()) || context.getPath().getDepth() < cacheStart)
         {

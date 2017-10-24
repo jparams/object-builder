@@ -3,7 +3,7 @@ package com.jparams.object.builder.provider;
 import java.lang.reflect.Array;
 import java.util.Random;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 import com.jparams.object.builder.type.MemberType;
 import com.jparams.object.builder.type.MemberTypeResolver;
 
@@ -18,7 +18,7 @@ public class ArrayProvider implements Provider
     }
 
     @Override
-    public Object[] provide(final ProviderContext context)
+    public Object[] provide(final Context context)
     {
         final Class<?> componentType = context.getPath().getMemberType().getType().getComponentType();
         final MemberType memberType = MemberTypeResolver.resolve(componentType);

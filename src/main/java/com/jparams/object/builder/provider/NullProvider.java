@@ -1,6 +1,6 @@
 package com.jparams.object.builder.provider;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 
 public class NullProvider implements Provider
 {
@@ -11,7 +11,7 @@ public class NullProvider implements Provider
     }
 
     @Override
-    public Object provide(final ProviderContext context)
+    public Object provide(final Context context)
     {
         final Class<?> type = context.getPath().getMemberType().getType();
 

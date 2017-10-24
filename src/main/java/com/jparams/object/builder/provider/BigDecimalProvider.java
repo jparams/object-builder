@@ -3,7 +3,7 @@ package com.jparams.object.builder.provider;
 import java.math.BigDecimal;
 import java.util.Random;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 
 public class BigDecimalProvider implements Provider
 {
@@ -16,7 +16,7 @@ public class BigDecimalProvider implements Provider
     }
 
     @Override
-    public BigDecimal provide(final ProviderContext context)
+    public BigDecimal provide(final Context context)
     {
         return BigDecimal.valueOf(random.nextDouble());
     }

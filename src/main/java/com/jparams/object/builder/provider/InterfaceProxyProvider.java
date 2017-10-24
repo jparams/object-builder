@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 import com.jparams.object.builder.type.MemberType;
 import com.jparams.object.builder.type.MemberTypeResolver;
 
@@ -18,7 +18,7 @@ public class InterfaceProxyProvider implements Provider
     }
 
     @Override
-    public Object provide(final ProviderContext context)
+    public Object provide(final Context context)
     {
         final InvocationHandler invocationHandler = new ResponseBuildingInvocationHandler(context);
         final Class<?> type = context.getPath().getMemberType().getType();
@@ -27,9 +27,9 @@ public class InterfaceProxyProvider implements Provider
 
     private static class ResponseBuildingInvocationHandler implements InvocationHandler
     {
-        private final ProviderContext context;
+        private final Context context;
 
-        ResponseBuildingInvocationHandler(final ProviderContext context)
+        ResponseBuildingInvocationHandler(final Context context)
         {
             this.context = context;
         }

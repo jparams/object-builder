@@ -5,7 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 import com.jparams.object.builder.type.MemberType;
 
 public class SetProvider implements Provider
@@ -19,10 +19,11 @@ public class SetProvider implements Provider
     }
 
     @Override
-    public Set<?> provide(final ProviderContext context)
+    public Set<?> provide(final Context context)
     {
         if (context.getPath().getMemberType().getGenerics().isEmpty())
         {
+            context.logWarning("No generics found. Could not populate Set");
             return Collections.emptySet();
         }
 

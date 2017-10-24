@@ -1,10 +1,10 @@
 package com.jparams.object.builder.provider;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 
 public interface Provider
 {
     boolean supports(Class<?> clazz);
 
-    Object provide(ProviderContext context);
+    Object provide(Context context);
 }

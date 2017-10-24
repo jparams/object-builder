@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.jparams.object.builder.factory.ObjectFactory;
 import com.jparams.object.builder.path.PathFilter;
 import com.jparams.object.builder.provider.ArrayProvider;
 import com.jparams.object.builder.provider.BigDecimalProvider;
 import com.jparams.object.builder.provider.BooleanProvider;
 import com.jparams.object.builder.provider.ByteProvider;
+import com.jparams.object.builder.provider.CachedDataProvider;
 import com.jparams.object.builder.provider.CharProvider;
 import com.jparams.object.builder.provider.DateProvider;
 import com.jparams.object.builder.provider.DoubleProvider;
@@ -28,7 +28,6 @@ import com.jparams.object.builder.provider.ObjectProvider;
 import com.jparams.object.builder.provider.Provider;
 import com.jparams.object.builder.provider.SetProvider;
 import com.jparams.object.builder.provider.StringProvider;
-import com.jparams.object.builder.provider.cache.CachedDataProvider;
 
 public class Configuration
 {
@@ -38,6 +37,8 @@ public class Configuration
     private int maxDepth;
     private boolean caching;
     private int cacheStart;
+    private boolean failOnError;
+    private boolean failOnWarning;
 
     public Configuration()
     {
@@ -47,6 +48,8 @@ public class Configuration
         this.maxDepth = 15;
         this.caching = false;
         this.cacheStart = 0;
+        this.failOnError = true;
+        this.failOnWarning = false;
     }
 
     public Configuration withMaxDepth(final int maxDepth)
@@ -64,6 +67,18 @@ public class Configuration
     public Configuration withNullProvider(final Provider nullProvider)
     {
         this.nullProvider = nullProvider;
+        return this;
+    }
+
+    public Configuration withFailOnError(final boolean failOnError)
+    {
+        this.failOnError = failOnError;
+        return this;
+    }
+
+    public Configuration withFailOnWarning(final boolean failOnWarning)
+    {
+        this.failOnWarning = failOnWarning;
         return this;
     }
 
@@ -113,7 +128,7 @@ public class Configuration
 
     ObjectFactory createObjectFactory()
     {
-        return new ObjectFactory(getProviders(), nullProvider, pathFilter, maxDepth);
+        return new ObjectFactory(getProviders(), nullProvider, pathFilter, maxDepth, failOnError, failOnWarning);
     }
 
     private List<Provider> getProviders()

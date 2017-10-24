@@ -2,7 +2,7 @@ package com.jparams.object.builder.provider;
 
 import java.util.Random;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 
 public class EnumProvider implements Provider
 {
@@ -15,7 +15,7 @@ public class EnumProvider implements Provider
     }
 
     @Override
-    public Enum provide(final ProviderContext context)
+    public Enum provide(final Context context)
     {
         final Class<?> type = context.getPath().getMemberType().getType();
         final int valueCount = type.getEnumConstants().length;

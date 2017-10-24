@@ -2,7 +2,7 @@ package com.jparams.object.builder.provider;
 
 import java.time.LocalTime;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 
 public class LocalTimeProvider implements Provider
 {
@@ -13,7 +13,7 @@ public class LocalTimeProvider implements Provider
     }
 
     @Override
-    public LocalTime provide(final ProviderContext context)
+    public LocalTime provide(final Context context)
     {
         return LocalTime.now();
     }

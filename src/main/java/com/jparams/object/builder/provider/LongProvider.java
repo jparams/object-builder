@@ -2,7 +2,7 @@ package com.jparams.object.builder.provider;
 
 import java.util.Random;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 
 public class LongProvider implements Provider
 {
@@ -15,7 +15,7 @@ public class LongProvider implements Provider
     }
 
     @Override
-    public Long provide(final ProviderContext context)
+    public Long provide(final Context context)
     {
         return random.nextLong();
     }

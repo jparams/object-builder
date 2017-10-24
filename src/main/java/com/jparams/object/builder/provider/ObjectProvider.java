@@ -10,18 +10,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.jparams.object.builder.path.Path;
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 import com.jparams.object.builder.type.MemberType;
 import com.jparams.object.builder.type.MemberTypeResolver;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class ObjectProvider implements Provider
 {
-    private static final Logger LOG = LoggerFactory.getLogger(ObjectProvider.class);
-
     @Override
     public boolean supports(final Class<?> clazz)
     {
@@ -29,13 +23,13 @@ public class ObjectProvider implements Provider
     }
 
     @Override
-    public Object provide(final ProviderContext context)
+    public Object provide(final Context context)
     {
         final List<Constructor<?>> constructors = getAllConstructors(context.getPath().getMemberType().getType());
 
         for (final Constructor<?> constructor : constructors)
         {
-            final Object instance = createInstance(context.getPath(), constructor, context);
+            final Object instance = createInstance(constructor, context);
 
             if (instance != null)
             {
@@ -44,11 +38,12 @@ public class ObjectProvider implements Provider
             }
         }
 
+        context.logError("No constructor found");
         return null;
     }
 
 
-    private Object createInstance(final Path path, final Constructor<?> constructor, final ProviderContext context)
+    private Object createInstance(final Constructor<?> constructor, final Context context)
     {
         final String name = String.format("%s(%s)", context.getPath().getMemberType().getType().getSimpleName(), getParametersString(constructor));
         final Object[] arguments = new Object[constructor.getParameters().length];
@@ -66,12 +61,12 @@ public class ObjectProvider implements Provider
         }
         catch (InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e)
         {
-            LOG.trace("Failed to createRootPath instance of [{}] at path [{}]. Failed with exception", path.getMemberType(), path.getLocation(), e);
+            context.logError("Failed to construct a new instance", e);
             return null;
         }
     }
 
-    private void injectFields(final Object object, final ProviderContext context)
+    private void injectFields(final Object object, final Context context)
     {
         Class<?> clazz = object.getClass();
 
@@ -91,8 +86,7 @@ public class ObjectProvider implements Provider
                     }
                     catch (final IllegalAccessException e)
                     {
-                        final Path path = context.getPath();
-                        LOG.trace("Failed to instance of [{}] at path [{}]. Failed with exception", path.getMemberType(), path.getLocation(), e);
+                        context.logError("Failed to inject field", e);
                     }
                 }
             }
@@ -101,12 +95,6 @@ public class ObjectProvider implements Provider
         }
     }
 
-    /**
-     * Get all constructor ordered by largest parameter count
-     *
-     * @param clazz class to scan
-     * @return constructors
-     */
     private static List<Constructor<?>> getAllConstructors(final Class<?> clazz)
     {
         return Arrays.stream(clazz.getDeclaredConstructors())
@@ -115,7 +103,7 @@ public class ObjectProvider implements Provider
                      .collect(Collectors.toList());
     }
 
-    public static String getParametersString(final Constructor<?> constructor)
+    private static String getParametersString(final Constructor<?> constructor)
     {
         return Arrays.stream(constructor.getParameters())
                      .map(param -> param.getType().getSimpleName() + " " + param.getName())

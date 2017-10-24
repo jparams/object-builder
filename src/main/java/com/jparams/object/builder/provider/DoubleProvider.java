@@ -2,7 +2,7 @@ package com.jparams.object.builder.provider;
 
 import java.util.Random;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 
 public class DoubleProvider implements Provider
 {
@@ -15,7 +15,7 @@ public class DoubleProvider implements Provider
     }
 
     @Override
-    public Double provide(final ProviderContext context)
+    public Double provide(final Context context)
     {
         return random.nextDouble();
     }

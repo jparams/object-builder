@@ -2,7 +2,7 @@ package com.jparams.object.builder.provider;
 
 import java.util.Random;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 
 public class ShortProvider implements Provider
 {
@@ -15,7 +15,7 @@ public class ShortProvider implements Provider
     }
 
     @Override
-    public Short provide(final ProviderContext context)
+    public Short provide(final Context context)
     {
         return (short) random.nextInt(Short.MAX_VALUE);
     }

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 import com.jparams.object.builder.type.MemberType;
 
 public class MapProvider implements Provider
@@ -19,10 +19,11 @@ public class MapProvider implements Provider
     }
 
     @Override
-    public Map<?, ?> provide(final ProviderContext context)
+    public Map<?, ?> provide(final Context context)
     {
         if (context.getPath().getMemberType().getGenerics().size() < 2)
         {
+            context.logWarning("No generics found. Could not populate Map");
             return Collections.emptyMap();
         }
 

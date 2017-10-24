@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 import com.jparams.object.builder.type.MemberType;
 
 public class ListProvider implements Provider
@@ -19,10 +19,11 @@ public class ListProvider implements Provider
     }
 
     @Override
-    public List<?> provide(final ProviderContext context)
+    public List<?> provide(final Context context)
     {
         if (context.getPath().getMemberType().getGenerics().isEmpty())
         {
+            context.logWarning("No generics found. Could not populate List");
             return Collections.emptyList();
         }
 

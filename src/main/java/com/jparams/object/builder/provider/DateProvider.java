@@ -2,7 +2,7 @@ package com.jparams.object.builder.provider;
 
 import java.util.Date;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 
 public class DateProvider implements Provider
 {
@@ -13,7 +13,7 @@ public class DateProvider implements Provider
     }
 
     @Override
-    public Date provide(final ProviderContext context)
+    public Date provide(final Context context)
     {
         return new Date();
     }

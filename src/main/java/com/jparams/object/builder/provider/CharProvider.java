@@ -2,7 +2,7 @@ package com.jparams.object.builder.provider;
 
 import java.util.UUID;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 
 public class CharProvider implements Provider
 {
@@ -13,7 +13,7 @@ public class CharProvider implements Provider
     }
 
     @Override
-    public Character provide(final ProviderContext context)
+    public Character provide(final Context context)
     {
         return UUID.randomUUID().toString().charAt(0);
     }

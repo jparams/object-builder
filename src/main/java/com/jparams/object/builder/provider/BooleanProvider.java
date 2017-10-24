@@ -2,7 +2,7 @@ package com.jparams.object.builder.provider;
 
 import java.util.Random;
 
-import com.jparams.object.builder.provider.context.ProviderContext;
+import com.jparams.object.builder.Context;
 
 public class BooleanProvider implements Provider
 {
@@ -15,7 +15,7 @@ public class BooleanProvider implements Provider
     }
 
     @Override
-    public Boolean provide(final ProviderContext context)
+    public Boolean provide(final Context context)
     {
         return random.nextBoolean();
     }

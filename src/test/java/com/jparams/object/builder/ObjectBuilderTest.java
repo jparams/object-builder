@@ -16,7 +16,6 @@ import com.jparams.object.builder.model.MyModel;
 import com.jparams.object.builder.model.MyModel2;
 import com.jparams.object.builder.model.MyModel3;
 import com.jparams.object.builder.provider.Provider;
-import com.jparams.object.builder.provider.context.ProviderContext;
 import com.jparams.object.builder.type.TypeReference;
 
 import org.junit.Before;
@@ -40,7 +39,7 @@ public class ObjectBuilderTest
     @Test
     public void createsArray()
     {
-        final String[] strings = subject.buildInstanceOf(String[].class);
+        final String[] strings = subject.buildInstanceOf(String[].class).get();
         assertThat(strings).isNotEmpty();
         assertThat(strings).doesNotContainNull();
     }
@@ -48,105 +47,105 @@ public class ObjectBuilderTest
     @Test
     public void createsBigDecimal()
     {
-        final BigDecimal value = subject.buildInstanceOf(BigDecimal.class);
+        final BigDecimal value = subject.buildInstanceOf(BigDecimal.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsBoolean()
     {
-        final Boolean value = subject.buildInstanceOf(Boolean.class);
+        final Boolean value = subject.buildInstanceOf(Boolean.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsBooleanPrimitive()
     {
-        final boolean value = subject.buildInstanceOf(boolean.class);
+        final boolean value = subject.buildInstanceOf(boolean.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsByte()
     {
-        final Byte value = subject.buildInstanceOf(Byte.class);
+        final Byte value = subject.buildInstanceOf(Byte.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsBytePrimitive()
     {
-        final byte value = subject.buildInstanceOf(byte.class);
+        final byte value = subject.buildInstanceOf(byte.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsChar()
     {
-        final Character value = subject.buildInstanceOf(Character.class);
+        final Character value = subject.buildInstanceOf(Character.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsCharPrimitive()
     {
-        final char value = subject.buildInstanceOf(char.class);
+        final char value = subject.buildInstanceOf(char.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsDate()
     {
-        final Date value = subject.buildInstanceOf(Date.class);
+        final Date value = subject.buildInstanceOf(Date.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsDouble()
     {
-        final Double value = subject.buildInstanceOf(Double.class);
+        final Double value = subject.buildInstanceOf(Double.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsDoublePrimitive()
     {
-        final double value = subject.buildInstanceOf(double.class);
+        final double value = subject.buildInstanceOf(double.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsFloat()
     {
-        final Float value = subject.buildInstanceOf(Float.class);
+        final Float value = subject.buildInstanceOf(Float.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsFloatPrimitive()
     {
-        final float value = subject.buildInstanceOf(float.class);
+        final float value = subject.buildInstanceOf(float.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsInteger()
     {
-        final Integer value = subject.buildInstanceOf(Integer.class);
+        final Integer value = subject.buildInstanceOf(Integer.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsIntegerPrimitive()
     {
-        final int value = subject.buildInstanceOf(int.class);
+        final int value = subject.buildInstanceOf(int.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsInterfaceProxy()
     {
-        final MyInterface value = subject.buildInstanceOf(MyInterface.class);
+        final MyInterface value = subject.buildInstanceOf(MyInterface.class).get();
 
         assertThat(value).isNotNull();
         assertThat(value.toString()).isNotNull();
@@ -158,7 +157,7 @@ public class ObjectBuilderTest
     @Test
     public void createsEmptyListWhenGenericsNotKnown()
     {
-        final List values = subject.buildInstanceOf(List.class);
+        final List values = subject.buildInstanceOf(List.class).get();
         assertThat(values).isEmpty();
     }
 
@@ -167,7 +166,7 @@ public class ObjectBuilderTest
     {
         final List values = subject.buildInstanceOf(new TypeReference<List<String>>()
         {
-        });
+        }).get();
 
         assertThat(values).isNotEmpty();
         assertThat(values).doesNotContainNull();
@@ -178,7 +177,7 @@ public class ObjectBuilderTest
     {
         final List values = subject.buildInstanceOf(new TypeReference<List<List<BigDecimal>>>()
         {
-        });
+        }).get();
 
         assertThat(values).isNotEmpty();
         assertThat(values).doesNotContainNull();
@@ -198,35 +197,35 @@ public class ObjectBuilderTest
     @Test
     public void createsLocalDateTime()
     {
-        final LocalDateTime value = subject.buildInstanceOf(LocalDateTime.class);
+        final LocalDateTime value = subject.buildInstanceOf(LocalDateTime.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsLocalDate()
     {
-        final LocalDate value = subject.buildInstanceOf(LocalDate.class);
+        final LocalDate value = subject.buildInstanceOf(LocalDate.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsLocalTime()
     {
-        final LocalTime value = subject.buildInstanceOf(LocalTime.class);
+        final LocalTime value = subject.buildInstanceOf(LocalTime.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsLong()
     {
-        final Long value = subject.buildInstanceOf(Long.class);
+        final Long value = subject.buildInstanceOf(Long.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsLongPrimitive()
     {
-        final long value = subject.buildInstanceOf(long.class);
+        final long value = subject.buildInstanceOf(long.class).get();
         assertThat(value).isNotNull();
     }
 
@@ -236,8 +235,8 @@ public class ObjectBuilderTest
         final Configuration configuration = new Configuration().withDefaultProviders().withCaching(true).withCacheStart(0);
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
 
-        final String str1 = subject.buildInstanceOf(String.class);
-        final String str2 = subject.buildInstanceOf(String.class);
+        final String str1 = subject.buildInstanceOf(String.class).get();
+        final String str2 = subject.buildInstanceOf(String.class).get();
 
         assertThat(str1).isNotNull();
         assertThat(str1).isEqualTo(str2);
@@ -249,8 +248,8 @@ public class ObjectBuilderTest
         final Configuration configuration = new Configuration().withDefaultProviders().withCaching(true).withCacheStart(1);
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
 
-        final MyModel myModel1 = subject.buildInstanceOf(MyModel.class);
-        final MyModel myModel2 = subject.buildInstanceOf(MyModel.class);
+        final MyModel myModel1 = subject.buildInstanceOf(MyModel.class).get();
+        final MyModel myModel2 = subject.buildInstanceOf(MyModel.class).get();
 
         assertThat(myModel1).isNotSameAs(myModel2);
         assertThat(myModel1).isEqualToComparingFieldByFieldRecursively(myModel2);
@@ -261,7 +260,7 @@ public class ObjectBuilderTest
     {
         final Map values = subject.buildInstanceOf(new TypeReference<Map>()
         {
-        });
+        }).get();
         assertThat(values).isEmpty();
     }
 
@@ -270,7 +269,7 @@ public class ObjectBuilderTest
     {
         final Map<String, BigDecimal> values = subject.buildInstanceOf(new TypeReference<Map<String, BigDecimal>>()
         {
-        });
+        }).get();
 
         assertThat(values).isNotEmpty();
     }
@@ -278,14 +277,14 @@ public class ObjectBuilderTest
     @Test
     public void createsEnum()
     {
-        final MyEnum value = subject.buildInstanceOf(MyEnum.class);
+        final MyEnum value = subject.buildInstanceOf(MyEnum.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsNullEnumWhenNoValuesAvailable()
     {
-        final MyEmptyEnum value = subject.buildInstanceOf(MyEmptyEnum.class);
+        final MyEmptyEnum value = subject.buildInstanceOf(MyEmptyEnum.class).get();
         assertThat(value).isNull();
     }
 
@@ -295,15 +294,15 @@ public class ObjectBuilderTest
         final Configuration configuration = new Configuration().withMaxDepth(-1);
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
 
-        assertThat(subject.buildInstanceOf(String.class)).isNull();
-        assertThat(subject.buildInstanceOf(byte.class)).isEqualTo((byte) 0);
-        assertThat(subject.buildInstanceOf(short.class)).isEqualTo((short) 0);
-        assertThat(subject.buildInstanceOf(int.class)).isEqualTo(0);
-        assertThat(subject.buildInstanceOf(long.class)).isEqualTo((long) 0);
-        assertThat(subject.buildInstanceOf(float.class)).isEqualTo((float) 0.0);
-        assertThat(subject.buildInstanceOf(double.class)).isEqualTo((double) 0.0);
-        assertThat(subject.buildInstanceOf(boolean.class)).isEqualTo(false);
-        assertThat(subject.buildInstanceOf(char.class)).isEqualTo('\u0000');
+        assertThat(subject.buildInstanceOf(String.class).get()).isNull();
+        assertThat(subject.buildInstanceOf(byte.class).get()).isEqualTo((byte) 0);
+        assertThat(subject.buildInstanceOf(short.class).get()).isEqualTo((short) 0);
+        assertThat(subject.buildInstanceOf(int.class).get()).isEqualTo(0);
+        assertThat(subject.buildInstanceOf(long.class).get()).isEqualTo((long) 0);
+        assertThat(subject.buildInstanceOf(float.class).get()).isEqualTo((float) 0.0);
+        assertThat(subject.buildInstanceOf(double.class).get()).isEqualTo((double) 0.0);
+        assertThat(subject.buildInstanceOf(boolean.class).get()).isEqualTo(false);
+        assertThat(subject.buildInstanceOf(char.class).get()).isEqualTo('\u0000');
     }
 
     @Test
@@ -311,28 +310,28 @@ public class ObjectBuilderTest
     {
         final Set values = subject.buildInstanceOf(new TypeReference<Set>()
         {
-        });
+        }).get();
         assertThat(values).isEmpty();
     }
 
     @Test
     public void createsShort()
     {
-        final Short value = subject.buildInstanceOf(Short.class);
+        final Short value = subject.buildInstanceOf(Short.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsShortPrimitive()
     {
-        final short value = subject.buildInstanceOf(short.class);
+        final short value = subject.buildInstanceOf(short.class).get();
         assertThat(value).isNotNull();
     }
 
     @Test
     public void createsNullOnException()
     {
-        final MyModel3 value = subject.buildInstanceOf(MyModel3.class);
+        final MyModel3 value = subject.buildInstanceOf(MyModel3.class).get();
         assertThat(value).isNull();
     }
 
@@ -344,13 +343,13 @@ public class ObjectBuilderTest
 
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
 
-        final MyModel myModel = subject.buildInstanceOf(MyModel.class);
+        final MyModel myModel = subject.buildInstanceOf(MyModel.class).get();
         assertThat(myModel).isNotNull();
         assertThat(myModel.getField4()).isNull();
     }
 
     @Test
-    public void createsDataFromCustomeProvider()
+    public void createsDataFromCustomProvider()
     {
         final MyModel2 myModel2 = new MyModel2();
         final Configuration configuration = new Configuration().withDefaultProviders()
@@ -363,7 +362,7 @@ public class ObjectBuilderTest
                                                                    }
 
                                                                    @Override
-                                                                   public Object provide(final ProviderContext context)
+                                                                   public Object provide(final Context context)
                                                                    {
                                                                        return myModel2;
                                                                    }
@@ -371,6 +370,6 @@ public class ObjectBuilderTest
 
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
 
-        assertThat(subject.buildInstanceOf(MyModel2.class)).isSameAs(myModel2);
+        assertThat(subject.buildInstanceOf(MyModel2.class).get()).isSameAs(myModel2);
     }
 }
