@@ -25,6 +25,7 @@ import com.jparams.object.builder.provider.LongProvider;
 import com.jparams.object.builder.provider.MapProvider;
 import com.jparams.object.builder.provider.NullProvider;
 import com.jparams.object.builder.provider.ObjectProvider;
+import com.jparams.object.builder.provider.ObjectProvider.InjectionStrategy;
 import com.jparams.object.builder.provider.Provider;
 import com.jparams.object.builder.provider.SetProvider;
 import com.jparams.object.builder.provider.StringProvider;
@@ -100,7 +101,7 @@ public class Configuration
         return this;
     }
 
-    public Configuration withDefaultProviders()
+    public Configuration withDefaultProviders(final InjectionStrategy injectionStrategy)
     {
         providers.add(new ArrayProvider());
         providers.add(new BigDecimalProvider());
@@ -121,9 +122,14 @@ public class Configuration
         providers.add(new ByteProvider());
         providers.add(new CharProvider());
         providers.add(new InterfaceProxyProvider());
-        providers.add(new ObjectProvider());
+        providers.add(new ObjectProvider(injectionStrategy));
         providers.add(new NullProvider());
         return this;
+    }
+
+    public Configuration withDefaultProviders()
+    {
+        return withDefaultProviders(InjectionStrategy.CONSTRUCTOR_INJECTION);
     }
 
     ObjectFactory createObjectFactory()

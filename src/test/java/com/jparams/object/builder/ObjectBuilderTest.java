@@ -15,6 +15,7 @@ import com.jparams.object.builder.model.MyInterface;
 import com.jparams.object.builder.model.MyModel;
 import com.jparams.object.builder.model.MyModel2;
 import com.jparams.object.builder.model.MyModel3;
+import com.jparams.object.builder.provider.ObjectProvider.InjectionStrategy;
 import com.jparams.object.builder.provider.Provider;
 import com.jparams.object.builder.type.TypeReference;
 
@@ -371,5 +372,21 @@ public class ObjectBuilderTest
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
 
         assertThat(subject.buildInstanceOf(MyModel2.class).get()).isSameAs(myModel2);
+    }
+
+    @Test
+    public void createsInstanceUsingConstructorInjection()
+    {
+        final Configuration configuration = new Configuration().withDefaultProviders(InjectionStrategy.CONSTRUCTOR_INJECTION);
+        final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
+        assertThat(subject.buildInstanceOf(MyModel.class).get()).isNotNull();
+    }
+
+    @Test
+    public void createsInstanceUsingFieldInjection()
+    {
+        final Configuration configuration = new Configuration().withDefaultProviders(InjectionStrategy.FIELD_INJECTION);
+        final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
+        assertThat(subject.buildInstanceOf(MyModel.class).get()).isNotNull();
     }
 }

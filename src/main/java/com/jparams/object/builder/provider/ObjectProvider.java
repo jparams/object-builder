@@ -7,15 +7,39 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import com.jparams.object.builder.Context;
 import com.jparams.object.builder.type.MemberType;
 import com.jparams.object.builder.type.MemberTypeResolver;
 
+import sun.misc.Unsafe;
+
 public class ObjectProvider implements Provider
 {
+    private static Unsafe unsafe;
+
+    static
+    {
+        try
+        {
+            final Field field = Unsafe.class.getDeclaredField("theUnsafe");
+            field.setAccessible(true);
+            unsafe = (Unsafe) field.get(null);
+        }
+        catch (final Exception e)
+        {
+            unsafe = null;
+        }
+    }
+
+    private final InjectionStrategy injectionStrategy;
+
+    public ObjectProvider(final InjectionStrategy injectionStrategy)
+    {
+        this.injectionStrategy = injectionStrategy;
+    }
+
     @Override
     public boolean supports(final Class<?> clazz)
     {
@@ -25,25 +49,38 @@ public class ObjectProvider implements Provider
     @Override
     public Object provide(final Context context)
     {
-        final List<Constructor<?>> constructors = getAllConstructors(context.getPath().getMemberType().getType());
-
-        for (final Constructor<?> constructor : constructors)
+        if (injectionStrategy == InjectionStrategy.CONSTRUCTOR_INJECTION)
         {
-            final Object instance = createInstance(constructor, context);
+            return createInstanceWithConstructor(context);
+        }
+        else if (injectionStrategy == InjectionStrategy.FIELD_INJECTION)
+        {
+            return createInstanceWithFieldInjection(context);
+        }
+        else
+        {
+            context.logError("Unknown injection strategy " + injectionStrategy);
+            return null;
+        }
+    }
 
-            if (instance != null)
-            {
-                injectFields(instance, context);
-                return instance;
-            }
+    private Object createInstanceWithConstructor(final Context context)
+    {
+        final Optional<Constructor<?>> constructor = Arrays.stream(context.getPath().getMemberType().getType().getDeclaredConstructors())
+                                                           .sorted(Comparator.comparingInt(Constructor::getParameterCount))
+                                                           .peek(c -> c.setAccessible(true))
+                                                           .findFirst();
+
+        if (constructor.isPresent())
+        {
+            return createInstanceWithConstructor(context, constructor.get());
         }
 
         context.logError("No constructor found");
         return null;
     }
 
-
-    private Object createInstance(final Constructor<?> constructor, final Context context)
+    private Object createInstanceWithConstructor(final Context context, final Constructor<?> constructor)
     {
         final String name = String.format("%s(%s)", context.getPath().getMemberType().getType().getSimpleName(), getParametersString(constructor));
         final Object[] arguments = new Object[constructor.getParameters().length];
@@ -61,7 +98,38 @@ public class ObjectProvider implements Provider
         }
         catch (InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e)
         {
-            context.logError("Failed to construct a new instance", e);
+            context.logError("Failed to construct an instance. Consider using Field Injection strategy", e);
+            return null;
+        }
+    }
+
+    private String getParametersString(final Constructor<?> constructor)
+    {
+        return Arrays.stream(constructor.getParameters())
+                     .map(param -> param.getType().getSimpleName() + " " + param.getName())
+                     .reduce((item1, item2) -> item1 + ", " + item2)
+                     .orElse("");
+    }
+
+    private Object createInstanceWithFieldInjection(final Context context)
+    {
+        if (unsafe == null)
+        {
+            context.logError("Field Injection strategy is not supported.  Consider using Constructor Injection strategy.");
+            return null;
+        }
+
+        final Class<?> type = context.getPath().getMemberType().getType();
+
+        try
+        {
+            final Object instance = unsafe.allocateInstance(type);
+            injectFields(instance, context);
+            return instance;
+        }
+        catch (final InstantiationException e)
+        {
+            context.logError("Field Injection strategy failed with error. Consider using Constructor Injection strategy.", e);
             return null;
         }
     }
@@ -74,7 +142,7 @@ public class ObjectProvider implements Provider
         {
             for (final Field field : clazz.getDeclaredFields())
             {
-                if (!Modifier.isFinal(field.getModifiers()))
+                if (!Modifier.isStatic(field.getModifiers()))
                 {
                     final MemberType memberType = MemberTypeResolver.resolve(field);
                     final Object instance = context.createChild(field.getName(), memberType);
@@ -95,19 +163,17 @@ public class ObjectProvider implements Provider
         }
     }
 
-    private static List<Constructor<?>> getAllConstructors(final Class<?> clazz)
-    {
-        return Arrays.stream(clazz.getDeclaredConstructors())
-                     .sorted(Comparator.comparingInt(Constructor::getParameterCount))
-                     .peek(constructor -> constructor.setAccessible(true))
-                     .collect(Collectors.toList());
-    }
 
-    private static String getParametersString(final Constructor<?> constructor)
+    public enum InjectionStrategy
     {
-        return Arrays.stream(constructor.getParameters())
-                     .map(param -> param.getType().getSimpleName() + " " + param.getName())
-                     .reduce((item1, item2) -> item1 + ", " + item2)
-                     .orElse("");
+        /**
+         * Constructs an instance of an object using the best possible constructor
+         */
+        CONSTRUCTOR_INJECTION,
+
+        /**
+         * Constructs an instance using field injection.
+         */
+        FIELD_INJECTION
     }
 }
