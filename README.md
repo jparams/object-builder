@@ -34,8 +34,8 @@ Building an object is easy, just configure the builder and let it do the job! He
 ```java
 public class Application {
     public static void main(String[] args) {
-        final ObjectBuilder objectBuilder = ObjectBuilder.withDefaultConfiguration();
-        final Person person = objectBuilder.buildInstanceOf(Person.class);
+        final ObjectBuilder objectBuilder = ObjectBuilder.withDefaultConfiguration(InjectionStrategy.FIELD_INJECTION);
+        final Person person = objectBuilder.buildInstanceOf(Person.class).get();
     }
     
     public static class Person {
