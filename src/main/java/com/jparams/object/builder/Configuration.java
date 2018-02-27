@@ -129,7 +129,7 @@ public class Configuration
 
     public Configuration withDefaultProviders()
     {
-        return withDefaultProviders(InjectionStrategy.CONSTRUCTOR_INJECTION);
+        return withDefaultProviders(InjectionStrategy.FIELD_INJECTION);
     }
 
     ObjectFactory createObjectFactory()
