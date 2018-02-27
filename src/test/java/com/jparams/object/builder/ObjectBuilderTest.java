@@ -332,6 +332,8 @@ public class ObjectBuilderTest
     @Test
     public void createsNullOnException()
     {
+        final Configuration configuration = new Configuration().withDefaultProviders(InjectionStrategy.CONSTRUCTOR_INJECTION);
+        final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
         final MyModel3 value = subject.buildInstanceOf(MyModel3.class).get();
         assertThat(value).isNull();
     }

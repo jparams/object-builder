@@ -15,7 +15,7 @@ apply plugin: 'maven'
 apply from: 'publish.gradle'
 
 group = 'com.jparams'
-version = '1.0.3'
+version = '1.0.4'
 
 sourceCompatibility = 1.8
 
@@ -24,8 +24,6 @@ repositories {
 }
 
 dependencies {
-    compile 'org.slf4j:slf4j-api:1.7.25'
-
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:2.6.0'
     testCompile 'eu.codearte.catch-exception:catch-exception:1.4.4'
