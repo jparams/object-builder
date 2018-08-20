@@ -12,6 +12,7 @@ import java.util.Optional;
 import com.jparams.object.builder.Context;
 import com.jparams.object.builder.type.MemberType;
 import com.jparams.object.builder.type.MemberTypeResolver;
+import com.jparams.object.builder.utils.ObjectUtils;
 
 import sun.misc.Unsafe;
 
@@ -136,33 +137,22 @@ public class ObjectProvider implements Provider
 
     private void injectFields(final Object object, final Context context)
     {
-        Class<?> clazz = object.getClass();
-
-        while (clazz != null)
+        for (final Field field : ObjectUtils.getFields(object.getClass()))
         {
-            for (final Field field : clazz.getDeclaredFields())
+            final MemberType memberType = MemberTypeResolver.resolve(field);
+            final Object instance = context.createChild(field.getName(), memberType);
+
+            try
             {
-                if (!Modifier.isStatic(field.getModifiers()))
-                {
-                    final MemberType memberType = MemberTypeResolver.resolve(field);
-                    final Object instance = context.createChild(field.getName(), memberType);
-
-                    try
-                    {
-                        field.setAccessible(true);
-                        field.set(object, instance);
-                    }
-                    catch (final IllegalAccessException e)
-                    {
-                        context.logError("Failed to inject field", e);
-                    }
-                }
+                field.setAccessible(true);
+                field.set(object, instance);
             }
-
-            clazz = clazz.getSuperclass();
+            catch (final IllegalAccessException e)
+            {
+                context.logError("Failed to inject field", e);
+            }
         }
     }
-
 
     public enum InjectionStrategy
     {
