@@ -14,26 +14,8 @@ import com.jparams.object.builder.type.MemberType;
 import com.jparams.object.builder.type.MemberTypeResolver;
 import com.jparams.object.builder.utils.ObjectUtils;
 
-import sun.misc.Unsafe;
-
 public class ObjectProvider implements Provider
 {
-    private static Unsafe unsafe;
-
-    static
-    {
-        try
-        {
-            final Field field = Unsafe.class.getDeclaredField("theUnsafe");
-            field.setAccessible(true);
-            unsafe = (Unsafe) field.get(null);
-        }
-        catch (final Exception e)
-        {
-            unsafe = null;
-        }
-    }
-
     private final InjectionStrategy injectionStrategy;
 
     public ObjectProvider(final InjectionStrategy injectionStrategy)
@@ -114,21 +96,15 @@ public class ObjectProvider implements Provider
 
     private Object createInstanceWithFieldInjection(final Context context)
     {
-        if (unsafe == null)
-        {
-            context.logError("Field Injection strategy is not supported.  Consider using Constructor Injection strategy.");
-            return null;
-        }
-
         final Class<?> type = context.getPath().getMemberType().getType();
 
         try
         {
-            final Object instance = unsafe.allocateInstance(type);
+            final Object instance = ObjectUtils.createInstance(type);
             injectFields(instance, context);
             return instance;
         }
-        catch (final InstantiationException e)
+        catch (final UnsupportedOperationException e)
         {
             context.logError("Field Injection strategy failed with error. Consider using Constructor Injection strategy.", e);
             return null;
