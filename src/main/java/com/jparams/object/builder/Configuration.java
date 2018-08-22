@@ -26,9 +26,11 @@ import com.jparams.object.builder.provider.MapProvider;
 import com.jparams.object.builder.provider.NullProvider;
 import com.jparams.object.builder.provider.ObjectProvider;
 import com.jparams.object.builder.provider.ObjectProvider.InjectionStrategy;
+import com.jparams.object.builder.provider.OffsetDateTimeProvider;
 import com.jparams.object.builder.provider.Provider;
 import com.jparams.object.builder.provider.SetProvider;
 import com.jparams.object.builder.provider.StringProvider;
+import com.jparams.object.builder.provider.ZonedDateTimeProvider;
 
 public class Configuration
 {
@@ -115,6 +117,8 @@ public class Configuration
         providers.add(new LocalDateProvider());
         providers.add(new LocalDateTimeProvider());
         providers.add(new LocalTimeProvider());
+        providers.add(new ZonedDateTimeProvider());
+        providers.add(new OffsetDateTimeProvider());
         providers.add(new LongProvider());
         providers.add(new MapProvider());
         providers.add(new SetProvider());

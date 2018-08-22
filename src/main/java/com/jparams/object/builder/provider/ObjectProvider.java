@@ -2,7 +2,6 @@ package com.jparams.object.builder.provider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
@@ -12,31 +11,19 @@ import java.util.Optional;
 import com.jparams.object.builder.Context;
 import com.jparams.object.builder.type.MemberType;
 import com.jparams.object.builder.type.MemberTypeResolver;
-
-import sun.misc.Unsafe;
+import com.jparams.object.builder.utils.ObjectUtils;
 
 public class ObjectProvider implements Provider
 {
-    private static Unsafe unsafe;
-
-    static
-    {
-        try
-        {
-            final Field field = Unsafe.class.getDeclaredField("theUnsafe");
-            field.setAccessible(true);
-            unsafe = (Unsafe) field.get(null);
-        }
-        catch (final Exception e)
-        {
-            unsafe = null;
-        }
-    }
-
     private final InjectionStrategy injectionStrategy;
 
     public ObjectProvider(final InjectionStrategy injectionStrategy)
     {
+        if (injectionStrategy == null)
+        {
+            throw new IllegalArgumentException("Injection Strategy is null");
+        }
+
         this.injectionStrategy = injectionStrategy;
     }
 
@@ -49,18 +36,15 @@ public class ObjectProvider implements Provider
     @Override
     public Object provide(final Context context)
     {
-        if (injectionStrategy == InjectionStrategy.CONSTRUCTOR_INJECTION)
+        switch (injectionStrategy)
         {
-            return createInstanceWithConstructor(context);
-        }
-        else if (injectionStrategy == InjectionStrategy.FIELD_INJECTION)
-        {
-            return createInstanceWithFieldInjection(context);
-        }
-        else
-        {
-            context.logError("Unknown injection strategy " + injectionStrategy);
-            return null;
+            case FIELD_INJECTION:
+                return createInstanceWithFieldInjection(context);
+            case CONSTRUCTOR_INJECTION:
+                return createInstanceWithConstructor(context);
+            default:
+                context.logError("Unknown injection strategy " + injectionStrategy);
+                return null;
         }
     }
 
@@ -96,7 +80,7 @@ public class ObjectProvider implements Provider
         {
             return constructor.newInstance(arguments);
         }
-        catch (InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e)
+        catch (final Exception e)
         {
             context.logError("Failed to construct an instance. Consider using Field Injection strategy", e);
             return null;
@@ -113,21 +97,15 @@ public class ObjectProvider implements Provider
 
     private Object createInstanceWithFieldInjection(final Context context)
     {
-        if (unsafe == null)
-        {
-            context.logError("Field Injection strategy is not supported.  Consider using Constructor Injection strategy.");
-            return null;
-        }
-
         final Class<?> type = context.getPath().getMemberType().getType();
 
         try
         {
-            final Object instance = unsafe.allocateInstance(type);
+            final Object instance = ObjectUtils.createInstance(type);
             injectFields(instance, context);
             return instance;
         }
-        catch (final InstantiationException e)
+        catch (final Exception e)
         {
             context.logError("Field Injection strategy failed with error. Consider using Constructor Injection strategy.", e);
             return null;
@@ -136,33 +114,22 @@ public class ObjectProvider implements Provider
 
     private void injectFields(final Object object, final Context context)
     {
-        Class<?> clazz = object.getClass();
-
-        while (clazz != null)
+        for (final Field field : ObjectUtils.getFields(object.getClass()))
         {
-            for (final Field field : clazz.getDeclaredFields())
+            final MemberType memberType = MemberTypeResolver.resolve(field);
+            final Object instance = context.createChild(field.getName(), memberType);
+
+            try
             {
-                if (!Modifier.isStatic(field.getModifiers()))
-                {
-                    final MemberType memberType = MemberTypeResolver.resolve(field);
-                    final Object instance = context.createChild(field.getName(), memberType);
-
-                    try
-                    {
-                        field.setAccessible(true);
-                        field.set(object, instance);
-                    }
-                    catch (final IllegalAccessException e)
-                    {
-                        context.logError("Failed to inject field", e);
-                    }
-                }
+                field.setAccessible(true);
+                field.set(object, instance);
             }
-
-            clazz = clazz.getSuperclass();
+            catch (final IllegalAccessException e)
+            {
+                context.logError("Failed to inject field", e);
+            }
         }
     }
-
 
     public enum InjectionStrategy
     {
