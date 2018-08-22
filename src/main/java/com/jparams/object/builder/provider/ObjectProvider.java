@@ -2,7 +2,6 @@ package com.jparams.object.builder.provider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
@@ -20,6 +19,11 @@ public class ObjectProvider implements Provider
 
     public ObjectProvider(final InjectionStrategy injectionStrategy)
     {
+        if (injectionStrategy == null)
+        {
+            throw new IllegalArgumentException("Injection Strategy is null");
+        }
+
         this.injectionStrategy = injectionStrategy;
     }
 
@@ -32,18 +36,15 @@ public class ObjectProvider implements Provider
     @Override
     public Object provide(final Context context)
     {
-        if (injectionStrategy == InjectionStrategy.CONSTRUCTOR_INJECTION)
+        switch (injectionStrategy)
         {
-            return createInstanceWithConstructor(context);
-        }
-        else if (injectionStrategy == InjectionStrategy.FIELD_INJECTION)
-        {
-            return createInstanceWithFieldInjection(context);
-        }
-        else
-        {
-            context.logError("Unknown injection strategy " + injectionStrategy);
-            return null;
+            case FIELD_INJECTION:
+                return createInstanceWithFieldInjection(context);
+            case CONSTRUCTOR_INJECTION:
+                return createInstanceWithConstructor(context);
+            default:
+                context.logError("Unknown injection strategy " + injectionStrategy);
+                return null;
         }
     }
 
@@ -79,7 +80,7 @@ public class ObjectProvider implements Provider
         {
             return constructor.newInstance(arguments);
         }
-        catch (InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e)
+        catch (final Exception e)
         {
             context.logError("Failed to construct an instance. Consider using Field Injection strategy", e);
             return null;
@@ -104,7 +105,7 @@ public class ObjectProvider implements Provider
             injectFields(instance, context);
             return instance;
         }
-        catch (final UnsupportedOperationException e)
+        catch (final Exception e)
         {
             context.logError("Field Injection strategy failed with error. Consider using Constructor Injection strategy.", e);
             return null;
