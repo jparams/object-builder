@@ -1,7 +1,7 @@
 # Object Builder
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.jparams/object-builder/badge.svg)](https://search.maven.org/search?q=g:com.jparams%20AND%20a:object-builder)
- [![Build Status](https://travis-ci.org/jparams/object-builder.svg?branch=master)](https://travis-ci.org/jparams/jparams-junit4)
+ [![Build Status](https://travis-ci.org/jparams/object-builder.svg?branch=master)](https://travis-ci.org/jparams/object-builder)
 
 ## Getting Started
 
