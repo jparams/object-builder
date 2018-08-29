@@ -22,7 +22,7 @@ public class EnumProvider implements Provider
 
         if (valueCount > 0)
         {
-            final int index = random.nextInt(valueCount - 1);
+            final int index = random.nextInt(valueCount);
             return (Enum<?>) type.getEnumConstants()[index];
         }
 
