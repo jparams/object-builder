@@ -1,5 +1,8 @@
 package com.jparams.object.builder.issue;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import com.jparams.object.builder.path.Path;
 
 public class Issue
@@ -35,5 +38,21 @@ public class Issue
     public Exception getCause()
     {
         return cause;
+    }
+
+    @Override
+    public String toString()
+    {
+        String stackTrace = "";
+
+        if (cause != null)
+        {
+            final StringWriter stringWriter = new StringWriter();
+            final PrintWriter printWriter = new PrintWriter(stringWriter);
+            cause.printStackTrace(printWriter);
+            stackTrace = "\nCause:\n" + stringWriter.toString();
+        }
+
+        return String.format("%s at path: %s\nMessage: %s%s", issueType, path, message, stackTrace);
     }
 }

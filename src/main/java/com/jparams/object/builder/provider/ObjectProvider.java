@@ -124,7 +124,7 @@ public class ObjectProvider implements Provider
                 field.setAccessible(true);
                 field.set(object, instance);
             }
-            catch (final IllegalAccessException e)
+            catch (final Exception e)
             {
                 context.logError("Failed to inject field", e);
             }
