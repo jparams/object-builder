@@ -13,6 +13,11 @@ public class NullProvider implements Provider
     @Override
     public Object provide(final Context context)
     {
+        if (context.getPath().getMemberType() == null)
+        {
+            return null;
+        }
+
         final Class<?> type = context.getPath().getMemberType().getType();
 
         if (type == byte.class)

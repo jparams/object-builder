@@ -116,17 +116,16 @@ public class ObjectProvider implements Provider
     {
         for (final Field field : ObjectUtils.getFields(object.getClass()))
         {
-            final MemberType memberType = MemberTypeResolver.resolve(field);
-            final Object instance = context.createChild(field.getName(), memberType);
-
             try
             {
+                final MemberType memberType = MemberTypeResolver.resolve(field);
+                final Object instance = context.createChild(field.getName(), memberType);
                 field.setAccessible(true);
                 field.set(object, instance);
             }
             catch (final Exception e)
             {
-                context.logError("Failed to inject field", e);
+                context.logError("Failed to inject field [" + field.getName() + "]", e);
             }
         }
     }

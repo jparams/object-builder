@@ -56,7 +56,7 @@ class ObjectFactory
         try
         {
             final T obj = (T) providers.stream()
-                                       .filter(provider -> provider.supports(path.getMemberType().getType()))
+                                       .filter(provider -> provider.supports(path.getMemberType() == null ? null : path.getMemberType().getType()))
                                        .map(provider -> provider.provide(context))
                                        .findFirst()
                                        .orElse(nullProvider.provide(context));
