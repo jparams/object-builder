@@ -34,13 +34,13 @@ public class ObjectBuilder
     public static ObjectBuilder withDefaultConfiguration()
     {
         final Configuration configuration = new Configuration().withDefaultProviders();
-        final ObjectFactory objectFactory = configuration.createObjectFactory();
+        final ObjectFactory objectFactory = configuration.buildObjectFactory();
         return new ObjectBuilder(objectFactory);
     }
 
     public static ObjectBuilder withConfiguration(final Configuration configuration)
     {
-        final ObjectFactory objectFactory = configuration.createObjectFactory();
+        final ObjectFactory objectFactory = configuration.buildObjectFactory();
         return new ObjectBuilder(objectFactory);
     }
 }

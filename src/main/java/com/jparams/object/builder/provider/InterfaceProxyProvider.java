@@ -37,7 +37,7 @@ public class InterfaceProxyProvider implements Provider
         @Override
         public Object invoke(final Object proxy, final Method method, final Object[] args)
         {
-            final String methodName = String.format("%s(%s", method.getName(), Arrays.toString(args));
+            final String methodName = String.format("%s(%s)", method.getName(), args == null || args.length == 0 ? "" : Arrays.toString(args));
             final MemberType memberType = MemberTypeResolver.resolve(method);
 
             if (memberType == null)

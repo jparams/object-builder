@@ -2,9 +2,13 @@ package com.jparams.object.builder;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.jparams.object.builder.path.PathFilter;
+import com.jparams.object.builder.provider.AllValueTypeProvider;
 import com.jparams.object.builder.provider.ArrayProvider;
 import com.jparams.object.builder.provider.BigDecimalProvider;
 import com.jparams.object.builder.provider.BooleanProvider;
@@ -25,8 +29,8 @@ import com.jparams.object.builder.provider.LongProvider;
 import com.jparams.object.builder.provider.MapProvider;
 import com.jparams.object.builder.provider.NullProvider;
 import com.jparams.object.builder.provider.ObjectProvider;
-import com.jparams.object.builder.provider.ObjectProvider.InjectionStrategy;
 import com.jparams.object.builder.provider.OffsetDateTimeProvider;
+import com.jparams.object.builder.provider.PrefabValueProvider;
 import com.jparams.object.builder.provider.Provider;
 import com.jparams.object.builder.provider.SetProvider;
 import com.jparams.object.builder.provider.SortedSetProvider;
@@ -36,6 +40,7 @@ import com.jparams.object.builder.provider.ZonedDateTimeProvider;
 public class Configuration
 {
     private final List<Provider> providers;
+    private final Map<Class<?>, Object> prefabValueMap;
     private PathFilter pathFilter;
     private Provider nullProvider;
     private int maxDepth;
@@ -47,6 +52,7 @@ public class Configuration
     public Configuration()
     {
         this.providers = new ArrayList<>();
+        this.prefabValueMap = new HashMap<>();
         this.pathFilter = (path) -> true;
         this.nullProvider = new NullProvider();
         this.maxDepth = 15;
@@ -68,7 +74,7 @@ public class Configuration
         return this;
     }
 
-    public Configuration withNullProvider(final Provider nullProvider)
+    public <T extends AllValueTypeProvider> Configuration withNullProvider(final T nullProvider)
     {
         this.nullProvider = nullProvider;
         return this;
@@ -88,7 +94,7 @@ public class Configuration
 
     public Configuration withProvider(final Provider provider)
     {
-        providers.add(0, provider);
+        providers.add(provider);
         return this;
     }
 
@@ -104,8 +110,37 @@ public class Configuration
         return this;
     }
 
-    public Configuration withDefaultProviders(final InjectionStrategy injectionStrategy)
+    public <T> Configuration withPrefabValue(final Class<T> clazz, final T value)
     {
+        this.prefabValueMap.put(clazz, value);
+        return this;
+    }
+
+
+    public ObjectFactory buildObjectFactory()
+    {
+        return new ObjectFactory(getProviders(), nullProvider, pathFilter, maxDepth, failOnError, failOnWarning);
+    }
+
+    private List<Provider> getProviders()
+    {
+        final LinkedList<Provider> providers = new LinkedList<>(this.providers);
+        providers.addAll(getDefaultProviders());
+        providers.addFirst(new PrefabValueProvider(prefabValueMap));
+        providers.addLast(new ObjectProvider(null));
+        providers.addLast(nullProvider);
+
+        if (caching)
+        {
+            return Collections.singletonList(new CachedDataProvider(providers, cacheStart));
+        }
+
+        return providers;
+    }
+
+    private static List<Provider> getDefaultProviders()
+    {
+        final List<Provider> providers = new ArrayList<>();
         providers.add(new ArrayProvider());
         providers.add(new BigDecimalProvider());
         providers.add(new BooleanProvider());
@@ -128,28 +163,6 @@ public class Configuration
         providers.add(new ByteProvider());
         providers.add(new CharProvider());
         providers.add(new InterfaceProxyProvider());
-        providers.add(new ObjectProvider(injectionStrategy));
-        providers.add(new NullProvider());
-        return this;
-    }
-
-    public Configuration withDefaultProviders()
-    {
-        return withDefaultProviders(InjectionStrategy.FIELD_INJECTION);
-    }
-
-    ObjectFactory createObjectFactory()
-    {
-        return new ObjectFactory(getProviders(), nullProvider, pathFilter, maxDepth, failOnError, failOnWarning);
-    }
-
-    private List<Provider> getProviders()
-    {
-        if (caching)
-        {
-            return Collections.singletonList(new CachedDataProvider(providers, cacheStart));
-        }
-
         return providers;
     }
 }

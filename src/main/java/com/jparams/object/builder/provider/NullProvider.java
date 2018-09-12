@@ -2,14 +2,8 @@ package com.jparams.object.builder.provider;
 
 import com.jparams.object.builder.Context;
 
-public class NullProvider implements Provider
+public class NullProvider extends AllValueTypeProvider
 {
-    @Override
-    public boolean supports(final Class<?> clazz)
-    {
-        return true;
-    }
-
     @Override
     public Object provide(final Context context)
     {
