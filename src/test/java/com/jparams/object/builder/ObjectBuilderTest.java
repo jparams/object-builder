@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import com.jparams.object.builder.model.MyEmptyEnum;
 import com.jparams.object.builder.model.MyEnum;
@@ -63,6 +64,18 @@ public class ObjectBuilderTest
     public void createsBooleanPrimitive()
     {
         final boolean value = subject.buildInstanceOf(boolean.class).get();
+        assertThat(value).isNotNull();
+    }
+
+    @Test
+    public void createsSortedSet()
+    {
+        final Build<SortedSet<String>> builder = subject.buildInstanceOf(new TypeReference<SortedSet<String>>()
+        {
+        });
+
+        final SortedSet<String> value = builder.get();
+
         assertThat(value).isNotNull();
     }
 

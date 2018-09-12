@@ -29,6 +29,7 @@ import com.jparams.object.builder.provider.ObjectProvider.InjectionStrategy;
 import com.jparams.object.builder.provider.OffsetDateTimeProvider;
 import com.jparams.object.builder.provider.Provider;
 import com.jparams.object.builder.provider.SetProvider;
+import com.jparams.object.builder.provider.SortedSetProvider;
 import com.jparams.object.builder.provider.StringProvider;
 import com.jparams.object.builder.provider.ZonedDateTimeProvider;
 
@@ -122,6 +123,7 @@ public class Configuration
         providers.add(new LongProvider());
         providers.add(new MapProvider());
         providers.add(new SetProvider());
+        providers.add(new SortedSetProvider());
         providers.add(new StringProvider());
         providers.add(new ByteProvider());
         providers.add(new CharProvider());
