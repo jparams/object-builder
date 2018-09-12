@@ -6,8 +6,10 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.Optional;
 
+import com.jparams.object.builder.BuildStrategy;
 import com.jparams.object.builder.Context;
 import com.jparams.object.builder.type.MemberType;
 import com.jparams.object.builder.type.MemberTypeResolver;
@@ -15,16 +17,13 @@ import com.jparams.object.builder.utils.ObjectUtils;
 
 public class ObjectProvider implements Provider
 {
-    private final InjectionStrategy injectionStrategy;
+    private final BuildStrategy defaultStrategy;
+    private final Map<Class<?>, BuildStrategy> strategyMap;
 
-    public ObjectProvider(final InjectionStrategy injectionStrategy)
+    public ObjectProvider(final BuildStrategy defaultStrategy, final Map<Class<?>, BuildStrategy> strategyMap)
     {
-        if (injectionStrategy == null)
-        {
-            throw new IllegalArgumentException("Injection Strategy is null");
-        }
-
-        this.injectionStrategy = injectionStrategy;
+        this.defaultStrategy = defaultStrategy;
+        this.strategyMap = strategyMap;
     }
 
     @Override
@@ -36,15 +35,32 @@ public class ObjectProvider implements Provider
     @Override
     public Object provide(final Context context)
     {
-        switch (injectionStrategy)
+        final Class<?> type = context.getPath().getMemberType().getType();
+        final BuildStrategy strategy = strategyMap.getOrDefault(type, defaultStrategy);
+
+        switch (strategy)
         {
+            case CONSTRUCTOR:
+                return createInstanceWithConstructor(context);
             case FIELD_INJECTION:
                 return createInstanceWithFieldInjection(context);
-            case CONSTRUCTOR_INJECTION:
-                return createInstanceWithConstructor(context);
+            case AUTO:
+                return createInstanceWithFallback(context);
             default:
-                context.logError("Unknown injection strategy " + injectionStrategy);
+                context.logError("Unknown injection strategy " + strategy);
                 return null;
+        }
+    }
+
+    private Object createInstanceWithFallback(final Context context)
+    {
+        try
+        {
+            return createInstanceWithConstructor(context);
+        }
+        catch (final Exception e)
+        {
+            return createInstanceWithFieldInjection(context);
         }
     }
 
@@ -128,18 +144,5 @@ public class ObjectProvider implements Provider
                 context.logError("Failed to inject field [" + field.getName() + "]", e);
             }
         }
-    }
-
-    public enum InjectionStrategy
-    {
-        /**
-         * Constructs an instance of an object using the best possible constructor
-         */
-        CONSTRUCTOR_INJECTION,
-
-        /**
-         * Constructs an instance using field injection.
-         */
-        FIELD_INJECTION
     }
 }

@@ -1,26 +1,30 @@
 package com.jparams.object.builder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import com.jparams.object.builder.path.PathFilter;
-import com.jparams.object.builder.provider.AllValueTypeProvider;
+import com.jparams.object.builder.provider.AnyValueTypeProvider;
 import com.jparams.object.builder.provider.ArrayProvider;
 import com.jparams.object.builder.provider.BigDecimalProvider;
 import com.jparams.object.builder.provider.BooleanProvider;
 import com.jparams.object.builder.provider.ByteProvider;
-import com.jparams.object.builder.provider.CachedDataProvider;
+import com.jparams.object.builder.provider.CachingProvider;
 import com.jparams.object.builder.provider.CharProvider;
+import com.jparams.object.builder.provider.ConcurrentMapProvider;
 import com.jparams.object.builder.provider.DateProvider;
+import com.jparams.object.builder.provider.DequeProvider;
 import com.jparams.object.builder.provider.DoubleProvider;
 import com.jparams.object.builder.provider.EnumProvider;
 import com.jparams.object.builder.provider.FloatProvider;
 import com.jparams.object.builder.provider.IntegerProvider;
-import com.jparams.object.builder.provider.InterfaceProxyProvider;
+import com.jparams.object.builder.provider.InterfaceProvider;
 import com.jparams.object.builder.provider.ListProvider;
 import com.jparams.object.builder.provider.LocalDateProvider;
 import com.jparams.object.builder.provider.LocalDateTimeProvider;
@@ -32,32 +36,38 @@ import com.jparams.object.builder.provider.ObjectProvider;
 import com.jparams.object.builder.provider.OffsetDateTimeProvider;
 import com.jparams.object.builder.provider.PrefabValueProvider;
 import com.jparams.object.builder.provider.Provider;
+import com.jparams.object.builder.provider.QueueProvider;
 import com.jparams.object.builder.provider.SetProvider;
+import com.jparams.object.builder.provider.SortedMapProvider;
 import com.jparams.object.builder.provider.SortedSetProvider;
 import com.jparams.object.builder.provider.StringProvider;
+import com.jparams.object.builder.provider.VectorProvider;
 import com.jparams.object.builder.provider.ZonedDateTimeProvider;
+import com.jparams.object.builder.type.MemberType;
 
-public class Configuration
+public final class Configuration
 {
     private final List<Provider> providers;
     private final Map<Class<?>, Object> prefabValueMap;
+    private final Map<Class<?>, BuildStrategy> buildStrategyMap;
+    private BuildStrategy defaultBuildStrategy;
     private PathFilter pathFilter;
     private Provider nullProvider;
     private int maxDepth;
-    private boolean caching;
-    private int cacheStart;
+    private Predicate<MemberType> cachePredicate;
     private boolean failOnError;
     private boolean failOnWarning;
 
-    public Configuration()
+    private Configuration()
     {
         this.providers = new ArrayList<>();
         this.prefabValueMap = new HashMap<>();
+        this.buildStrategyMap = new HashMap<>();
+        this.defaultBuildStrategy = BuildStrategy.AUTO;
         this.pathFilter = (path) -> true;
         this.nullProvider = new NullProvider();
         this.maxDepth = 15;
-        this.caching = false;
-        this.cacheStart = 0;
+        this.cachePredicate = memberType -> false;
         this.failOnError = true;
         this.failOnWarning = false;
     }
@@ -74,7 +84,7 @@ public class Configuration
         return this;
     }
 
-    public <T extends AllValueTypeProvider> Configuration withNullProvider(final T nullProvider)
+    public <T extends AnyValueTypeProvider> Configuration withNullProvider(final T nullProvider)
     {
         this.nullProvider = nullProvider;
         return this;
@@ -98,15 +108,37 @@ public class Configuration
         return this;
     }
 
-    public Configuration withCaching(final boolean caching)
+    public Configuration withCacheAll()
     {
-        this.caching = caching;
+        this.cachePredicate = (memberType) -> true;
         return this;
     }
 
-    public Configuration withCacheStart(final int cacheStart)
+    public Configuration withCachingOnly(final MemberType... memberTypes)
     {
-        this.cacheStart = cacheStart;
+        return withCachingOnly(Arrays.asList(memberTypes));
+    }
+
+    public Configuration withCachingOnly(final Collection<MemberType> memberTypes)
+    {
+        this.cachePredicate = memberTypes::contains;
+        return this;
+    }
+
+    public Configuration withCachingAllExcluding(final MemberType... memberTypes)
+    {
+        return withCachingAllExcluding(Arrays.asList(memberTypes));
+    }
+
+    public Configuration withCachingAllExcluding(final Collection<MemberType> memberTypes)
+    {
+        this.cachePredicate = memberType -> !memberTypes.contains(memberType);
+        return this;
+    }
+
+    public Configuration withCaching(final Predicate<MemberType> predicate)
+    {
+        this.cachePredicate = predicate;
         return this;
     }
 
@@ -116,26 +148,33 @@ public class Configuration
         return this;
     }
 
-
-    public ObjectFactory buildObjectFactory()
+    public Configuration withDefaultBuildStrategy(final BuildStrategy defaultBuildStrategy)
     {
-        return new ObjectFactory(getProviders(), nullProvider, pathFilter, maxDepth, failOnError, failOnWarning);
+        this.defaultBuildStrategy = defaultBuildStrategy;
+        return this;
     }
 
-    private List<Provider> getProviders()
+    public Configuration withBuildStrategy(final Class<?> clazz, final BuildStrategy buildStrategy)
     {
-        final LinkedList<Provider> providers = new LinkedList<>(this.providers);
+        this.buildStrategyMap.put(clazz, buildStrategy);
+        return this;
+    }
+
+    ObjectFactory buildObjectFactory()
+    {
+        return new ObjectFactory(buildProviders(), nullProvider, pathFilter, maxDepth, failOnError, failOnWarning);
+    }
+
+    private List<Provider> buildProviders()
+    {
+        // combine user defined providers with default providers
+        final List<Provider> providers = new ArrayList<>(this.providers);
         providers.addAll(getDefaultProviders());
-        providers.addFirst(new PrefabValueProvider(prefabValueMap));
-        providers.addLast(new ObjectProvider(null));
-        providers.addLast(nullProvider);
+        providers.add(0, new PrefabValueProvider(prefabValueMap));
+        providers.add(new ObjectProvider(defaultBuildStrategy, buildStrategyMap));
+        providers.add(nullProvider);
 
-        if (caching)
-        {
-            return Collections.singletonList(new CachedDataProvider(providers, cacheStart));
-        }
-
-        return providers;
+        return Collections.singletonList(new CachingProvider(providers, cachePredicate));
     }
 
     private static List<Provider> getDefaultProviders()
@@ -157,12 +196,22 @@ public class Configuration
         providers.add(new OffsetDateTimeProvider());
         providers.add(new LongProvider());
         providers.add(new MapProvider());
+        providers.add(new SortedMapProvider());
+        providers.add(new ConcurrentMapProvider());
         providers.add(new SetProvider());
+        providers.add(new QueueProvider());
+        providers.add(new DequeProvider());
+        providers.add(new VectorProvider());
         providers.add(new SortedSetProvider());
         providers.add(new StringProvider());
         providers.add(new ByteProvider());
         providers.add(new CharProvider());
-        providers.add(new InterfaceProxyProvider());
+        providers.add(new InterfaceProvider());
         return providers;
+    }
+
+    public static Configuration defaultConfiguration()
+    {
+        return new Configuration();
     }
 }

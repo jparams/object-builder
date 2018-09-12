@@ -2,7 +2,7 @@ package com.jparams.object.builder.provider;
 
 import com.jparams.object.builder.Context;
 
-public class NullProvider extends AllValueTypeProvider
+public class NullProvider extends AnyValueTypeProvider
 {
     @Override
     public Object provide(final Context context)

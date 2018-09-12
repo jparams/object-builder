@@ -16,8 +16,8 @@ import com.jparams.object.builder.model.MyInterface;
 import com.jparams.object.builder.model.MyModel;
 import com.jparams.object.builder.model.MyModel2;
 import com.jparams.object.builder.model.MyModel3;
-import com.jparams.object.builder.provider.ObjectProvider.InjectionStrategy;
 import com.jparams.object.builder.provider.Provider;
+import com.jparams.object.builder.type.MemberType;
 import com.jparams.object.builder.type.TypeReference;
 
 import org.junit.Before;
@@ -29,9 +29,6 @@ public class ObjectBuilderTest
 {
     private ObjectBuilder subject;
 
-    /**
-     * set up
-     */
     @Before
     public void setUp()
     {
@@ -246,7 +243,7 @@ public class ObjectBuilderTest
     @Test
     public void returnsCachedData()
     {
-        final Configuration configuration = new Configuration().withDefaultProviders().withCaching(true).withCacheStart(0);
+        final Configuration configuration = Configuration.defaultConfiguration().withCacheAll();
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
 
         final String str1 = subject.buildInstanceOf(String.class).get();
@@ -259,7 +256,7 @@ public class ObjectBuilderTest
     @Test
     public void returnsShallowCopy()
     {
-        final Configuration configuration = new Configuration().withDefaultProviders().withCaching(true).withCacheStart(1);
+        final Configuration configuration = Configuration.defaultConfiguration().withCachingAllExcluding(new MemberType(MyModel.class));
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
 
         final MyModel myModel1 = subject.buildInstanceOf(MyModel.class).get();
@@ -270,6 +267,7 @@ public class ObjectBuilderTest
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void createsEmptyMapWhenGenericsNotKnown()
     {
         final Map values = subject.buildInstanceOf(new TypeReference<Map>()
@@ -305,7 +303,7 @@ public class ObjectBuilderTest
     @Test
     public void createsNullValueWhenDepthExhausted()
     {
-        final Configuration configuration = new Configuration().withMaxDepth(-1);
+        final Configuration configuration = Configuration.defaultConfiguration().withMaxDepth(-1);
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
 
         assertThat(subject.buildInstanceOf(String.class).get()).isNull();
@@ -345,7 +343,7 @@ public class ObjectBuilderTest
     @Test
     public void createsNullOnException()
     {
-        final Configuration configuration = new Configuration().withDefaultProviders(InjectionStrategy.CONSTRUCTOR_INJECTION);
+        final Configuration configuration = Configuration.defaultConfiguration().withDefaultBuildStrategy(BuildStrategy.CONSTRUCTOR);
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
         final MyModel3 value = subject.buildInstanceOf(MyModel3.class).get();
         assertThat(value).isNull();
@@ -354,8 +352,8 @@ public class ObjectBuilderTest
     @Test
     public void createsNullWhenPathIsFilteredOut()
     {
-        final Configuration configuration = new Configuration().withDefaultProviders()
-                                                               .withPathFilter((path) -> !path.getName().equals("field4"));
+        final Configuration configuration = Configuration.defaultConfiguration()
+                                                         .withPathFilter((path) -> !path.getName().equals("field4"));
 
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
 
@@ -368,21 +366,21 @@ public class ObjectBuilderTest
     public void createsDataFromCustomProvider()
     {
         final MyModel2 myModel2 = new MyModel2();
-        final Configuration configuration = new Configuration().withDefaultProviders()
-                                                               .withProvider(new Provider()
-                                                               {
-                                                                   @Override
-                                                                   public boolean supports(final Class<?> clazz)
-                                                                   {
-                                                                       return clazz == MyModel2.class;
-                                                                   }
+        final Configuration configuration = Configuration.defaultConfiguration()
+                                                         .withProvider(new Provider()
+                                                         {
+                                                             @Override
+                                                             public boolean supports(final Class<?> clazz)
+                                                             {
+                                                                 return clazz == MyModel2.class;
+                                                             }
 
-                                                                   @Override
-                                                                   public Object provide(final Context context)
-                                                                   {
-                                                                       return myModel2;
-                                                                   }
-                                                               });
+                                                             @Override
+                                                             public Object provide(final Context context)
+                                                             {
+                                                                 return myModel2;
+                                                             }
+                                                         });
 
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
 
@@ -392,7 +390,7 @@ public class ObjectBuilderTest
     @Test
     public void createsInstanceUsingConstructorInjection()
     {
-        final Configuration configuration = new Configuration().withDefaultProviders(InjectionStrategy.CONSTRUCTOR_INJECTION);
+        final Configuration configuration = Configuration.defaultConfiguration().withDefaultBuildStrategy(BuildStrategy.CONSTRUCTOR);
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
         assertThat(subject.buildInstanceOf(MyModel.class).get()).isNotNull();
     }
@@ -400,7 +398,7 @@ public class ObjectBuilderTest
     @Test
     public void createsInstanceUsingFieldInjection()
     {
-        final Configuration configuration = new Configuration().withDefaultProviders(InjectionStrategy.FIELD_INJECTION);
+        final Configuration configuration = Configuration.defaultConfiguration().withDefaultBuildStrategy(BuildStrategy.FIELD_INJECTION);
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
         assertThat(subject.buildInstanceOf(MyModel.class).get()).isNotNull();
     }
