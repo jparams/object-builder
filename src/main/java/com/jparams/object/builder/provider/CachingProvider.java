@@ -8,18 +8,18 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import com.jparams.object.builder.Context;
-import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.Type;
 
 /**
- * Caches and returns the same value of a known {@link MemberType}
+ * Caches and returns the same value of a known {@link Type}
  */
 public class CachingProvider implements Provider
 {
-    private final Map<MemberType, Object> cache = new HashMap<>();
+    private final Map<Type, Object> cache = new HashMap<>();
     private final List<Provider> providers;
-    private final Predicate<MemberType> cachePredicate;
+    private final Predicate<Type> cachePredicate;
 
-    public CachingProvider(final List<Provider> providers, final Predicate<MemberType> cachePredicate)
+    public CachingProvider(final List<Provider> providers, final Predicate<Type> cachePredicate)
     {
         this.providers = new ArrayList<>(providers);
         this.cachePredicate = cachePredicate;
@@ -28,7 +28,7 @@ public class CachingProvider implements Provider
     @Override
     public synchronized Object provide(final Context context)
     {
-        final MemberType memberType = context.getPath().getMemberType();
+        final Type memberType = context.getPath().getType();
 
         if (!cachePredicate.test(memberType))
         {
@@ -46,20 +46,20 @@ public class CachingProvider implements Provider
     }
 
     @Override
-    public boolean supports(final Class<?> clazz)
+    public boolean supports(final Type type)
     {
-        return findSupportingProvider(clazz).isPresent();
+        return findSupportingProvider(type).isPresent();
     }
 
-    private Object getObject(final Context context, final MemberType memberType)
+    private Object getObject(final Context context, final Type type)
     {
-        return findSupportingProvider(memberType.getType()).map(provider -> provider.provide(context)).orElse(null);
+        return findSupportingProvider(type).map(provider -> provider.provide(context)).orElse(null);
     }
 
-    private Optional<Provider> findSupportingProvider(final Class<?> clazz)
+    private Optional<Provider> findSupportingProvider(final Type type)
     {
         return providers.stream()
-                        .filter(provider -> provider.supports(clazz))
+                        .filter(provider -> provider.supports(type))
                         .findFirst();
     }
 }

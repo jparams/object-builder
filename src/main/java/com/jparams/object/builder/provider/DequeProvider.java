@@ -4,14 +4,14 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import com.jparams.object.builder.Context;
-import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.Type;
 
 public class DequeProvider implements Provider
 {
     @Override
-    public boolean supports(final Class<?> clazz)
+    public boolean supports(final Type type)
     {
-        return clazz.isAssignableFrom(Deque.class);
+        return type.getJavaType().isAssignableFrom(Deque.class);
     }
 
     @Override
@@ -19,13 +19,13 @@ public class DequeProvider implements Provider
     {
         final Deque<Object> deque = new ArrayDeque<>();
 
-        if (context.getPath().getMemberType().getGenerics().isEmpty())
+        if (context.getPath().getType().getGenerics().isEmpty())
         {
             context.logWarning("No generics found. Could not populate List");
             return deque;
         }
 
-        final MemberType memberType = context.getPath().getMemberType().getGenerics().get(0);
+        final Type memberType = context.getPath().getType().getGenerics().get(0);
         deque.add(context.createChild("[0]", memberType));
         return deque;
     }

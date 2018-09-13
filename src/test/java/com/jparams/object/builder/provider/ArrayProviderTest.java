@@ -4,7 +4,7 @@ import java.util.Set;
 
 import com.jparams.object.builder.Context;
 import com.jparams.object.builder.path.Path;
-import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.Type;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,8 +28,8 @@ public class ArrayProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Integer[].class)).isTrue();
-        assertThat(subject.supports(Set.class)).isFalse();
+        assertThat(subject.supports(Type.forClass(Integer[].class).build())).isTrue();
+        assertThat(subject.supports(Type.forClass(Set.class).build())).isFalse();
     }
 
     @Test
@@ -37,13 +37,14 @@ public class ArrayProviderTest
     public void testProvide()
     {
         final Context mockContext = mock(Context.class);
-        when(mockContext.getPath()).thenReturn(new Path("", new MemberType(Integer[].class), null));
+        final Type type = Type.forClass(Integer[].class).build();
+        when(mockContext.getPath()).thenReturn(new Path("", type, null));
         when(mockContext.createChild(any(), any())).thenReturn(1);
 
         final Object[] provided = subject.provide(mockContext);
 
         assertThat(provided).containsExactly(1);
 
-        verify(mockContext).createChild("[0]", new MemberType(Integer.class));
+        verify(mockContext).createChild("[0]", Type.forClass(Integer.class).build());
     }
 }

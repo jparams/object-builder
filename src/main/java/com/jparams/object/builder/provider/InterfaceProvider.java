@@ -8,22 +8,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.jparams.object.builder.Context;
-import com.jparams.object.builder.type.MemberType;
-import com.jparams.object.builder.type.MemberTypeResolver;
+import com.jparams.object.builder.type.Type;
+import com.jparams.object.builder.type.TypeResolver;
 
 public class InterfaceProvider implements Provider
 {
     @Override
-    public boolean supports(final Class<?> clazz)
+    public boolean supports(final Type type)
     {
-        return clazz.isInterface();
+        return type.getJavaType().isInterface();
     }
 
     @Override
     public Object provide(final Context context)
     {
         final InvocationHandler invocationHandler = new ResponseBuildingInvocationHandler(context);
-        final Class<?> type = context.getPath().getMemberType().getType();
+        final Class<?> type = context.getPath().getType().getJavaType();
         return Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[]{type}, invocationHandler);
     }
 
@@ -46,7 +46,7 @@ public class InterfaceProvider implements Provider
             }
 
             final String methodName = String.format("%s(%s)", method.getName(), args == null || args.length == 0 ? "" : Arrays.toString(args));
-            final MemberType memberType = MemberTypeResolver.resolve(method);
+            final Type memberType = TypeResolver.resolve(method);
 
             if (memberType == null)
             {

@@ -4,26 +4,26 @@ import java.util.Collections;
 import java.util.Set;
 
 import com.jparams.object.builder.Context;
-import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.Type;
 
 public class SetProvider implements Provider
 {
     @Override
-    public boolean supports(final Class<?> clazz)
+    public boolean supports(final Type type)
     {
-        return clazz.isAssignableFrom(Set.class);
+        return type.getJavaType().isAssignableFrom(Set.class);
     }
 
     @Override
     public Set<?> provide(final Context context)
     {
-        if (context.getPath().getMemberType().getGenerics().isEmpty())
+        if (context.getPath().getType().getGenerics().isEmpty())
         {
             context.logWarning("No generics found. Could not populate Set");
             return Collections.emptySet();
         }
 
-        final MemberType memberType = context.getPath().getMemberType().getGenerics().get(0);
+        final Type memberType = context.getPath().getType().getGenerics().get(0);
         return Collections.singleton(context.createChild("[0]", memberType));
     }
 }

@@ -1,7 +1,6 @@
 package com.jparams.object.builder.type;
 
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 
 import com.jparams.object.builder.path.Path;
 
@@ -23,11 +22,11 @@ public abstract class TypeReference<T> implements Comparable<T>
     {
         if (typeReference.getClass().getGenericSuperclass() instanceof ParameterizedType)
         {
-            final Type[] types = ((ParameterizedType) typeReference.getClass().getGenericSuperclass()).getActualTypeArguments();
+            final java.lang.reflect.Type[] types = ((ParameterizedType) typeReference.getClass().getGenericSuperclass()).getActualTypeArguments();
 
             if (types.length > 0)
             {
-                final MemberType memberType = MemberTypeResolver.resolve(types[0]);
+                final Type memberType = TypeResolver.resolve(types[0]);
                 return new Path("$", memberType, null);
             }
         }

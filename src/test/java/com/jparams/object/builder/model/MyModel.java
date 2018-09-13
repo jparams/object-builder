@@ -11,9 +11,9 @@ public class MyModel
     private final Set<BigDecimal> field3;
     private MyModel field4;
 
-    public MyModel(final String field1, final List<MyModel2> myModel2s, final List<MyModel2> field2, final Set<BigDecimal> field3)
+    public MyModel(final String field1, final List<MyModel2> field2, final Set<BigDecimal> field3)
     {
-        this.field1 = field1;
+        this.field1 = "--" + field1;
         this.field2 = field2;
         this.field3 = field3;
     }

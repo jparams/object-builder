@@ -1,33 +1,30 @@
 package com.jparams.object.builder.provider;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.jparams.object.builder.Context;
+import com.jparams.object.builder.type.Type;
+import com.jparams.object.builder.type.TypeMap;
 
 /**
  * Prefab value provider
  */
 public class PrefabValueProvider implements Provider
 {
-    private final Map<Class<?>, Object> prefabValueMap;
+    private final TypeMap<Object> prefabValueMap;
 
-    public PrefabValueProvider(final Map<Class<?>, Object> prefabValueMap)
+    public PrefabValueProvider(final TypeMap<Object> prefabValueMap)
     {
-        this.prefabValueMap = prefabValueMap == null ? Collections.emptyMap() : Collections.unmodifiableMap(new HashMap<>(prefabValueMap));
+        this.prefabValueMap = prefabValueMap;
     }
 
     @Override
-    public boolean supports(final Class<?> clazz)
+    public boolean supports(final Type type)
     {
-        return prefabValueMap.containsKey(clazz);
+        return prefabValueMap.findMatch(type).isPresent();
     }
 
     @Override
     public Object provide(final Context context)
     {
-        final Class<?> type = context.getPath().getMemberType().getType();
-        return prefabValueMap.get(type);
+        return prefabValueMap.findMatch(context.getPath().getType()).orElse(null);
     }
 }

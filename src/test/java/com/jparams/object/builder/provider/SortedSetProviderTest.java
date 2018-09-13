@@ -1,12 +1,11 @@
 package com.jparams.object.builder.provider;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;
 
 import com.jparams.object.builder.Context;
 import com.jparams.object.builder.path.Path;
-import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.Type;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,8 +29,8 @@ public class SortedSetProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(SortedSet.class)).isTrue();
-        assertThat(subject.supports(List.class)).isFalse();
+        assertThat(subject.supports(Type.forClass(SortedSet.class).build())).isTrue();
+        assertThat(subject.supports(Type.forClass(List.class).build())).isFalse();
     }
 
     @Test
@@ -39,7 +38,7 @@ public class SortedSetProviderTest
     public void testProvideReturnsEmptyOnUnknownGeneric()
     {
         final Context mockContext = mock(Context.class);
-        when(mockContext.getPath()).thenReturn(new Path("", new MemberType(SortedSet.class), null));
+        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(SortedSet.class).build(), null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 
         final SortedSet<?> provided = subject.provide(mockContext);
@@ -52,14 +51,14 @@ public class SortedSetProviderTest
     public void testProvide()
     {
         final Context mockContext = mock(Context.class);
-        final MemberType genericType = new MemberType(String.class);
-        when(mockContext.getPath()).thenReturn(new Path("", new MemberType(SortedSet.class, Collections.singletonList(genericType)), null));
+        final Type type = Type.forClass(SortedSet.class).withGenerics(String.class).build();
+        when(mockContext.getPath()).thenReturn(new Path("", type, null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 
         final SortedSet<?> provided = subject.provide(mockContext);
 
         assertThat((SortedSet) provided).containsExactly("abc");
 
-        verify(mockContext).createChild("[0]", genericType);
+        verify(mockContext).createChild("[0]", type.getGenerics().get(0));
     }
 }

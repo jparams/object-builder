@@ -4,14 +4,14 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 import com.jparams.object.builder.Context;
-import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.Type;
 
 public class QueueProvider implements Provider
 {
     @Override
-    public boolean supports(final Class<?> clazz)
+    public boolean supports(final Type type)
     {
-        return clazz.isAssignableFrom(Queue.class);
+        return type.getJavaType().isAssignableFrom(Queue.class);
     }
 
     @Override
@@ -19,13 +19,13 @@ public class QueueProvider implements Provider
     {
         final Queue<Object> queue = new ArrayDeque<>();
 
-        if (context.getPath().getMemberType().getGenerics().isEmpty())
+        if (context.getPath().getType().getGenerics().isEmpty())
         {
             context.logWarning("No generics found. Could not populate List");
             return queue;
         }
 
-        final MemberType memberType = context.getPath().getMemberType().getGenerics().get(0);
+        final Type memberType = context.getPath().getType().getGenerics().get(0);
         queue.add(context.createChild("[0]", memberType));
         return queue;
     }

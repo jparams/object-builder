@@ -1,12 +1,11 @@
 package com.jparams.object.builder.provider;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 
 import com.jparams.object.builder.Context;
 import com.jparams.object.builder.path.Path;
-import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.Type;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,8 +29,8 @@ public class ConcurrentMapProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(ConcurrentMap.class)).isTrue();
-        assertThat(subject.supports(List.class)).isFalse();
+        assertThat(subject.supports(Type.forClass(ConcurrentMap.class).build())).isTrue();
+        assertThat(subject.supports(Type.forClass(List.class).build())).isFalse();
     }
 
     @Test
@@ -39,7 +38,8 @@ public class ConcurrentMapProviderTest
     public void testProvideReturnsEmptyOnUnknownGeneric()
     {
         final Context mockContext = mock(Context.class);
-        when(mockContext.getPath()).thenReturn(new Path("", new MemberType(ConcurrentMap.class), null));
+        final Type type = Type.forClass(ConcurrentMap.class).build();
+        when(mockContext.getPath()).thenReturn(new Path("", type, null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 
         final ConcurrentMap<?, ?> provided = subject.provide(mockContext);
@@ -52,17 +52,16 @@ public class ConcurrentMapProviderTest
     public void testProvide()
     {
         final Context mockContext = mock(Context.class);
-        final MemberType keyGenericType = new MemberType(String.class);
-        final MemberType valueGenericType = new MemberType(String.class);
-        when(mockContext.getPath()).thenReturn(new Path("", new MemberType(ConcurrentMap.class, Arrays.asList(keyGenericType, valueGenericType)), null));
+        final Type type = Type.forClass(ConcurrentMap.class).withGenerics(String.class, String.class).build();
+        when(mockContext.getPath()).thenReturn(new Path("", type, null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 
         final ConcurrentMap<?, ?> provided = subject.provide(mockContext);
 
         assertThat((ConcurrentMap) provided).containsEntry("abc", "abc");
 
-        verify(mockContext).createChild("[0.key]", keyGenericType);
-        verify(mockContext).createChild("[0.value]", valueGenericType);
+        verify(mockContext).createChild("[0.key]", type.getGenerics().get(0));
+        verify(mockContext).createChild("[0.value]", type.getGenerics().get(1));
 
     }
 }

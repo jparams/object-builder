@@ -2,15 +2,15 @@ package com.jparams.object.builder.path;
 
 import java.util.Objects;
 
-import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.Type;
 
 public class Path
 {
     private final String name;
-    private final MemberType memberType;
+    private final Type memberType;
     private final Path parent;
 
-    public Path(final String name, final MemberType memberType, final Path parent)
+    public Path(final String name, final Type memberType, final Path parent)
     {
         this.name = name;
         this.memberType = memberType;
@@ -22,7 +22,7 @@ public class Path
         return name;
     }
 
-    public MemberType getMemberType()
+    public Type getType()
     {
         return memberType;
     }

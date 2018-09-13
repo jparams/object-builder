@@ -17,7 +17,7 @@ import com.jparams.object.builder.model.MyModel;
 import com.jparams.object.builder.model.MyModel2;
 import com.jparams.object.builder.model.MyModel3;
 import com.jparams.object.builder.provider.Provider;
-import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.Type;
 import com.jparams.object.builder.type.TypeReference;
 
 import org.junit.Before;
@@ -256,7 +256,7 @@ public class ObjectBuilderTest
     @Test
     public void returnsShallowCopy()
     {
-        final Configuration configuration = Configuration.defaultConfiguration().withCachingAllExcluding(new MemberType(MyModel.class));
+        final Configuration configuration = Configuration.defaultConfiguration().withCachingAllExcluding(Type.forClass(MyModel.class).build());
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
 
         final MyModel myModel1 = subject.buildInstanceOf(MyModel.class).get();
@@ -370,9 +370,9 @@ public class ObjectBuilderTest
                                                          .withProvider(new Provider()
                                                          {
                                                              @Override
-                                                             public boolean supports(final Class<?> clazz)
+                                                             public boolean supports(final Type type)
                                                              {
-                                                                 return clazz == MyModel2.class;
+                                                                 return type.getJavaType() == MyModel2.class;
                                                              }
 
                                                              @Override
@@ -392,14 +392,76 @@ public class ObjectBuilderTest
     {
         final Configuration configuration = Configuration.defaultConfiguration().withDefaultBuildStrategy(BuildStrategy.CONSTRUCTOR);
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
-        assertThat(subject.buildInstanceOf(MyModel.class).get()).isNotNull();
+        final MyModel actual = subject.buildInstanceOf(MyModel.class).get();
+        assertThat(actual).isNotNull();
+        assertThat(actual.getField1()).startsWith("--");
     }
+
+    @Test
+    public void createsInstanceUsingConstructorInjectionOverridden()
+    {
+        final Configuration configuration = Configuration.defaultConfiguration().withBuildStrategy(Type.forClass(MyModel.class).build(), BuildStrategy.CONSTRUCTOR).withDefaultBuildStrategy(BuildStrategy.FIELD_INJECTION);
+        final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
+        final MyModel actual = subject.buildInstanceOf(MyModel.class).get();
+        assertThat(actual).isNotNull();
+        assertThat(actual.getField1()).startsWith("--");
+    }
+
 
     @Test
     public void createsInstanceUsingFieldInjection()
     {
         final Configuration configuration = Configuration.defaultConfiguration().withDefaultBuildStrategy(BuildStrategy.FIELD_INJECTION);
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
-        assertThat(subject.buildInstanceOf(MyModel.class).get()).isNotNull();
+        final MyModel actual = subject.buildInstanceOf(MyModel.class).get();
+        assertThat(actual).isNotNull();
+        assertThat(actual.getField1()).doesNotStartWith("--");
+    }
+
+    @Test
+    public void createsInstanceUsingFieldInjectionOverridden()
+    {
+        final Configuration configuration = Configuration.defaultConfiguration().withBuildStrategy(Type.forClass(MyModel.class).build(), BuildStrategy.FIELD_INJECTION).withDefaultBuildStrategy(BuildStrategy.CONSTRUCTOR);
+        final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
+        final MyModel actual = subject.buildInstanceOf(MyModel.class).get();
+        assertThat(actual).isNotNull();
+        assertThat(actual.getField1()).doesNotStartWith("--");
+    }
+
+    @Test
+    public void returnsPrefabValue()
+    {
+        final Configuration configuration = Configuration.defaultConfiguration().withPrefabValue(Type.forClass(float.class).build(), 10F);
+        final float value = ObjectBuilder.withConfiguration(configuration).buildInstanceOf(float.class).get();
+        assertThat(value).isEqualTo(10F);
+    }
+
+    @Test
+    public void returnsCacheOnlyValue()
+    {
+        final Configuration configuration = Configuration.defaultConfiguration().withCachingOnly(Type.forClass(MyModel.class).build());
+        final ObjectBuilder objectBuilder = ObjectBuilder.withConfiguration(configuration);
+        final MyModel value = objectBuilder.buildInstanceOf(MyModel.class).get();
+        assertThat(value).isNotNull();
+        assertThat(value).isSameAs(objectBuilder.buildInstanceOf(MyModel.class).get());
+        assertThat(value).isSameAs(objectBuilder.buildInstanceOf(MyModel.class).get());
+    }
+
+    @Test
+    public void returnsCacheExcludingValue()
+    {
+        final Configuration configuration = Configuration.defaultConfiguration().withCachingAllExcluding(Type.forClass(MyModel.class).build());
+        final ObjectBuilder objectBuilder = ObjectBuilder.withConfiguration(configuration);
+        final MyModel value = objectBuilder.buildInstanceOf(MyModel.class).get();
+
+        assertThat(value).isNotNull();
+
+        final MyModel rebuild1 = objectBuilder.buildInstanceOf(MyModel.class).get();
+        assertThat(value).isNotSameAs(rebuild1).isEqualToComparingFieldByFieldRecursively(rebuild1);
+
+        final MyModel rebuild2 = objectBuilder.buildInstanceOf(MyModel.class).get();
+        assertThat(value).isNotSameAs(rebuild2).isEqualToComparingFieldByFieldRecursively(rebuild2);
+
+        assertThat(rebuild1).isNotSameAs(rebuild2).isEqualToComparingFieldByFieldRecursively(rebuild2);
     }
 }

@@ -7,12 +7,12 @@ public class NullProvider extends AnyValueTypeProvider
     @Override
     public Object provide(final Context context)
     {
-        if (context.getPath().getMemberType() == null)
+        if (context.getPath().getType() == null)
         {
             return null;
         }
 
-        final Class<?> type = context.getPath().getMemberType().getType();
+        final Class<?> type = context.getPath().getType().getJavaType();
 
         if (type == byte.class)
         {

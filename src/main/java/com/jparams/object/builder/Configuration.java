@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
 import com.jparams.object.builder.path.PathFilter;
@@ -43,26 +41,28 @@ import com.jparams.object.builder.provider.SortedSetProvider;
 import com.jparams.object.builder.provider.StringProvider;
 import com.jparams.object.builder.provider.VectorProvider;
 import com.jparams.object.builder.provider.ZonedDateTimeProvider;
-import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.Type;
+import com.jparams.object.builder.type.TypeMap;
+import com.jparams.object.builder.type.TypeSet;
 
 public final class Configuration
 {
     private final List<Provider> providers;
-    private final Map<Class<?>, Object> prefabValueMap;
-    private final Map<Class<?>, BuildStrategy> buildStrategyMap;
+    private final TypeMap<Object> prefabValueMap;
+    private final TypeMap<BuildStrategy> buildStrategyMap;
     private BuildStrategy defaultBuildStrategy;
     private PathFilter pathFilter;
     private Provider nullProvider;
     private int maxDepth;
-    private Predicate<MemberType> cachePredicate;
+    private Predicate<Type> cachePredicate;
     private boolean failOnError;
     private boolean failOnWarning;
 
     private Configuration()
     {
         this.providers = new ArrayList<>();
-        this.prefabValueMap = new HashMap<>();
-        this.buildStrategyMap = new HashMap<>();
+        this.prefabValueMap = new TypeMap<>();
+        this.buildStrategyMap = new TypeMap<>();
         this.defaultBuildStrategy = BuildStrategy.AUTO;
         this.pathFilter = (path) -> true;
         this.nullProvider = new NullProvider();
@@ -110,41 +110,41 @@ public final class Configuration
 
     public Configuration withCacheAll()
     {
-        this.cachePredicate = (memberType) -> true;
+        this.cachePredicate = (type) -> true;
         return this;
     }
 
-    public Configuration withCachingOnly(final MemberType... memberTypes)
+    public Configuration withCachingOnly(final Type... types)
     {
-        return withCachingOnly(Arrays.asList(memberTypes));
+        return withCachingOnly(Arrays.asList(types));
     }
 
-    public Configuration withCachingOnly(final Collection<MemberType> memberTypes)
+    public Configuration withCachingOnly(final Collection<Type> types)
     {
-        this.cachePredicate = memberTypes::contains;
-        return this;
+        final TypeSet set = new TypeSet(types);
+        return withCaching(set::contains);
     }
 
-    public Configuration withCachingAllExcluding(final MemberType... memberTypes)
+    public Configuration withCachingAllExcluding(final Type... types)
     {
-        return withCachingAllExcluding(Arrays.asList(memberTypes));
+        return withCachingAllExcluding(Arrays.asList(types));
     }
 
-    public Configuration withCachingAllExcluding(final Collection<MemberType> memberTypes)
+    public Configuration withCachingAllExcluding(final Collection<Type> types)
     {
-        this.cachePredicate = memberType -> !memberTypes.contains(memberType);
-        return this;
+        final TypeSet set = new TypeSet(types);
+        return withCaching(type -> !set.contains(type));
     }
 
-    public Configuration withCaching(final Predicate<MemberType> predicate)
+    public Configuration withCaching(final Predicate<Type> predicate)
     {
         this.cachePredicate = predicate;
         return this;
     }
 
-    public <T> Configuration withPrefabValue(final Class<T> clazz, final T value)
+    public <T> Configuration withPrefabValue(final Type type, final T value)
     {
-        this.prefabValueMap.put(clazz, value);
+        this.prefabValueMap.put(type, value);
         return this;
     }
 
@@ -154,9 +154,9 @@ public final class Configuration
         return this;
     }
 
-    public Configuration withBuildStrategy(final Class<?> clazz, final BuildStrategy buildStrategy)
+    public Configuration withBuildStrategy(final Type type, final BuildStrategy buildStrategy)
     {
-        this.buildStrategyMap.put(clazz, buildStrategy);
+        this.buildStrategyMap.put(type, buildStrategy);
         return this;
     }
 

@@ -3,13 +3,14 @@ package com.jparams.object.builder.provider;
 import java.util.UUID;
 
 import com.jparams.object.builder.Context;
+import com.jparams.object.builder.type.Type;
 
 public class CharProvider implements Provider
 {
     @Override
-    public boolean supports(final Class<?> clazz)
+    public boolean supports(final Type type)
     {
-        return clazz.isAssignableFrom(Character.class) || clazz.isAssignableFrom(char.class);
+        return type.getJavaType().isAssignableFrom(Character.class) || type.getJavaType().isAssignableFrom(char.class);
     }
 
     @Override
