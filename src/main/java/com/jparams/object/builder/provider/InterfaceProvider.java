@@ -4,30 +4,33 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.jparams.object.builder.Context;
-import com.jparams.object.builder.type.MemberType;
-import com.jparams.object.builder.type.MemberTypeResolver;
+import com.jparams.object.builder.type.Type;
+import com.jparams.object.builder.type.TypeResolver;
 
-public class InterfaceProxyProvider implements Provider
+public class InterfaceProvider implements Provider
 {
     @Override
-    public boolean supports(final Class<?> clazz)
+    public boolean supports(final Type type)
     {
-        return clazz.isInterface();
+        return type.getJavaType().isInterface();
     }
 
     @Override
     public Object provide(final Context context)
     {
         final InvocationHandler invocationHandler = new ResponseBuildingInvocationHandler(context);
-        final Class<?> type = context.getPath().getMemberType().getType();
+        final Class<?> type = context.getPath().getType().getJavaType();
         return Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[]{type}, invocationHandler);
     }
 
     private static class ResponseBuildingInvocationHandler implements InvocationHandler
     {
         private final Context context;
+        private final Map<Method, Object> cache = new HashMap<>();
 
         ResponseBuildingInvocationHandler(final Context context)
         {
@@ -37,15 +40,23 @@ public class InterfaceProxyProvider implements Provider
         @Override
         public Object invoke(final Object proxy, final Method method, final Object[] args)
         {
-            final String methodName = String.format("%s(%s", method.getName(), Arrays.toString(args));
-            final MemberType memberType = MemberTypeResolver.resolve(method);
+            if (cache.containsKey(method))
+            {
+                return cache.get(method);
+            }
+
+            final String methodName = String.format("%s(%s)", method.getName(), args == null || args.length == 0 ? "" : Arrays.toString(args));
+            final Type memberType = TypeResolver.resolve(method);
 
             if (memberType == null)
             {
+                cache.put(method, null);
                 return null;
             }
 
-            return context.createChild(methodName, memberType);
+            final Object returnValue = context.createChild(methodName, memberType);
+            cache.put(method, returnValue);
+            return returnValue;
         }
     }
 }

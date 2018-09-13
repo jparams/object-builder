@@ -3,13 +3,14 @@ package com.jparams.object.builder.provider;
 import java.util.Date;
 
 import com.jparams.object.builder.Context;
+import com.jparams.object.builder.type.Type;
 
 public class DateProvider implements Provider
 {
     @Override
-    public boolean supports(final Class<?> clazz)
+    public boolean supports(final Type type)
     {
-        return clazz.isAssignableFrom(Date.class);
+        return type.getJavaType().isAssignableFrom(Date.class);
     }
 
     @Override

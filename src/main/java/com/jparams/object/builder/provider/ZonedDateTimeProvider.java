@@ -4,15 +4,16 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import com.jparams.object.builder.Context;
+import com.jparams.object.builder.type.Type;
 
 public class ZonedDateTimeProvider implements Provider
 {
     private static final ZoneId UTC = ZoneId.of("UTC");
 
     @Override
-    public boolean supports(final Class<?> clazz)
+    public boolean supports(final Type type)
     {
-        return clazz.isAssignableFrom(ZonedDateTime.class);
+        return type.getJavaType().isAssignableFrom(ZonedDateTime.class);
     }
 
     @Override

@@ -3,13 +3,14 @@ package com.jparams.object.builder.provider;
 import java.time.LocalDate;
 
 import com.jparams.object.builder.Context;
+import com.jparams.object.builder.type.Type;
 
 public class LocalDateProvider implements Provider
 {
     @Override
-    public boolean supports(final Class<?> clazz)
+    public boolean supports(final Type type)
     {
-        return clazz.isAssignableFrom(LocalDate.class);
+        return type.getJavaType().isAssignableFrom(LocalDate.class);
     }
 
     @Override

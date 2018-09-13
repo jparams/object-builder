@@ -2,23 +2,17 @@ package com.jparams.object.builder.provider;
 
 import com.jparams.object.builder.Context;
 
-public class NullProvider implements Provider
+public class NullProvider extends AnyValueTypeProvider
 {
-    @Override
-    public boolean supports(final Class<?> clazz)
-    {
-        return true;
-    }
-
     @Override
     public Object provide(final Context context)
     {
-        if (context.getPath().getMemberType() == null)
+        if (context.getPath().getType() == null)
         {
             return null;
         }
 
-        final Class<?> type = context.getPath().getMemberType().getType();
+        final Class<?> type = context.getPath().getType().getJavaType();
 
         if (type == byte.class)
         {

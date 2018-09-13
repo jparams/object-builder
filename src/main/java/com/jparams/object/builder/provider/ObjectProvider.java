@@ -8,71 +8,84 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
 
+import com.jparams.object.builder.BuildStrategy;
 import com.jparams.object.builder.Context;
-import com.jparams.object.builder.type.MemberType;
-import com.jparams.object.builder.type.MemberTypeResolver;
+import com.jparams.object.builder.type.Type;
+import com.jparams.object.builder.type.TypeMap;
+import com.jparams.object.builder.type.TypeResolver;
 import com.jparams.object.builder.utils.ObjectUtils;
 
 public class ObjectProvider implements Provider
 {
-    private final InjectionStrategy injectionStrategy;
+    private final BuildStrategy defaultStrategy;
+    private final TypeMap<BuildStrategy> strategyMap;
 
-    public ObjectProvider(final InjectionStrategy injectionStrategy)
+    public ObjectProvider(final BuildStrategy defaultStrategy, final TypeMap<BuildStrategy> strategyMap)
     {
-        if (injectionStrategy == null)
-        {
-            throw new IllegalArgumentException("Injection Strategy is null");
-        }
-
-        this.injectionStrategy = injectionStrategy;
+        this.defaultStrategy = defaultStrategy;
+        this.strategyMap = strategyMap;
     }
 
     @Override
-    public boolean supports(final Class<?> clazz)
+    public boolean supports(final Type type)
     {
-        return !clazz.isPrimitive() && !clazz.isEnum() && !clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers());
+        return !type.getJavaType().isPrimitive() && !type.getJavaType().isEnum() && !type.getJavaType().isInterface() && !Modifier.isAbstract(type.getJavaType().getModifiers());
     }
 
     @Override
     public Object provide(final Context context)
     {
-        switch (injectionStrategy)
+        final BuildStrategy strategy = strategyMap.findMatch(context.getPath().getType()).orElse(defaultStrategy);
+
+        switch (strategy)
         {
+            case CONSTRUCTOR:
+                return createInstanceWithConstructor(context, true);
             case FIELD_INJECTION:
                 return createInstanceWithFieldInjection(context);
-            case CONSTRUCTOR_INJECTION:
-                return createInstanceWithConstructor(context);
+            case AUTO:
+                return createInstanceWithFallback(context);
             default:
-                context.logError("Unknown injection strategy " + injectionStrategy);
+                context.logError("Unknown injection strategy " + strategy);
                 return null;
         }
     }
 
-    private Object createInstanceWithConstructor(final Context context)
+    private Object createInstanceWithFallback(final Context context)
     {
-        final Optional<Constructor<?>> constructor = Arrays.stream(context.getPath().getMemberType().getType().getDeclaredConstructors())
+        final Object created = createInstanceWithConstructor(context, false);
+        return created == null ? createInstanceWithFieldInjection(context) : created;
+    }
+
+    private Object createInstanceWithConstructor(final Context context, final boolean logOnFailure)
+    {
+        final Optional<Constructor<?>> constructor = Arrays.stream(context.getPath().getType().getJavaType().getDeclaredConstructors())
                                                            .sorted(Comparator.comparingInt(Constructor::getParameterCount))
                                                            .peek(c -> c.setAccessible(true))
                                                            .findFirst();
 
         if (constructor.isPresent())
         {
-            return createInstanceWithConstructor(context, constructor.get());
+            return createInstanceWithConstructor(context, constructor.get(), logOnFailure);
         }
 
-        context.logError("No constructor found");
+        if (logOnFailure)
+        {
+            context.logError("No constructor found");
+        }
+
         return null;
     }
 
-    private Object createInstanceWithConstructor(final Context context, final Constructor<?> constructor)
+    private Object createInstanceWithConstructor(final Context context, final Constructor<?> constructor, final boolean logOnFailure)
     {
-        final String name = String.format("%s(%s)", context.getPath().getMemberType().getType().getSimpleName(), getParametersString(constructor));
+        final String name = String.format("%s(%s)", context.getPath().getType().getJavaType().getSimpleName(), getParametersString(constructor));
         final Object[] arguments = new Object[constructor.getParameters().length];
 
         for (int i = 0; i < constructor.getParameters().length; i++)
         {
             final Parameter parameter = constructor.getParameters()[i];
-            final MemberType memberType = MemberTypeResolver.resolve(parameter);
+            final Type memberType = TypeResolver.resolve(parameter);
             arguments[i] = context.createChild(name + "[" + i + "]", memberType);
         }
 
@@ -82,7 +95,11 @@ public class ObjectProvider implements Provider
         }
         catch (final Exception e)
         {
-            context.logError("Failed to construct an instance. Consider using Field Injection strategy", e);
+            if (logOnFailure)
+            {
+                context.logError("Failed to build an instance using the constructor build strategy", e);
+            }
+
             return null;
         }
     }
@@ -97,7 +114,7 @@ public class ObjectProvider implements Provider
 
     private Object createInstanceWithFieldInjection(final Context context)
     {
-        final Class<?> type = context.getPath().getMemberType().getType();
+        final Class<?> type = context.getPath().getType().getJavaType();
 
         try
         {
@@ -107,7 +124,7 @@ public class ObjectProvider implements Provider
         }
         catch (final Exception e)
         {
-            context.logError("Field Injection strategy failed with error. Consider using Constructor Injection strategy.", e);
+            context.logError("Failed to build an instance using the field injection build strategy", e);
             return null;
         }
     }
@@ -118,7 +135,7 @@ public class ObjectProvider implements Provider
         {
             try
             {
-                final MemberType memberType = MemberTypeResolver.resolve(field);
+                final Type memberType = TypeResolver.resolve(field);
                 final Object instance = context.createChild(field.getName(), memberType);
                 field.setAccessible(true);
                 field.set(object, instance);
@@ -128,18 +145,5 @@ public class ObjectProvider implements Provider
                 context.logError("Failed to inject field [" + field.getName() + "]", e);
             }
         }
-    }
-
-    public enum InjectionStrategy
-    {
-        /**
-         * Constructs an instance of an object using the best possible constructor
-         */
-        CONSTRUCTOR_INJECTION,
-
-        /**
-         * Constructs an instance using field injection.
-         */
-        FIELD_INJECTION
     }
 }

@@ -4,15 +4,16 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 
 import com.jparams.object.builder.Context;
+import com.jparams.object.builder.type.Type;
 
 public class OffsetDateTimeProvider implements Provider
 {
     private static final ZoneId UTC = ZoneId.of("UTC");
 
     @Override
-    public boolean supports(final Class<?> clazz)
+    public boolean supports(final Type type)
     {
-        return clazz.isAssignableFrom(OffsetDateTime.class);
+        return type.getJavaType().isAssignableFrom(OffsetDateTime.class);
     }
 
     @Override

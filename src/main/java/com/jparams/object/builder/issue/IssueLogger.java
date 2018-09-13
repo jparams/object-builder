@@ -21,6 +21,8 @@ public class IssueLogger
 
     public void log(final Issue issue)
     {
+        issues.add(issue);
+
         if (issue.getIssueType() == IssueType.WARNING && failOnWarning)
         {
             throw new BuilderFailedException("ObjectBuilder failed with the WARNING [" + issue.getMessage() + "] at path [" + issue.getPath() + "]");
@@ -30,8 +32,6 @@ public class IssueLogger
         {
             throw new BuilderFailedException("ObjectBuilder failed with the ERROR [" + issue.getMessage() + "] at path [" + issue.getPath() + "]");
         }
-
-        issues.add(issue);
     }
 
     public List<Issue> getIssues()

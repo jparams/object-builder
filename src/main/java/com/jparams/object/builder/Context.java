@@ -4,7 +4,7 @@ import com.jparams.object.builder.issue.Issue;
 import com.jparams.object.builder.issue.IssueLogger;
 import com.jparams.object.builder.issue.IssueType;
 import com.jparams.object.builder.path.Path;
-import com.jparams.object.builder.type.MemberType;
+import com.jparams.object.builder.type.Type;
 
 public class Context
 {
@@ -24,7 +24,7 @@ public class Context
         return path;
     }
 
-    public Object createChild(final String name, final MemberType memberType)
+    public Object createChild(final String name, final Type memberType)
     {
         final Path childPath = new Path(name, memberType, this.path);
         final Build<Object> build = objectFactory.create(childPath, issueLogger);

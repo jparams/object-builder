@@ -4,15 +4,16 @@ import java.math.BigDecimal;
 import java.util.Random;
 
 import com.jparams.object.builder.Context;
+import com.jparams.object.builder.type.Type;
 
 public class BigDecimalProvider implements Provider
 {
     private final Random random = new Random();
 
     @Override
-    public boolean supports(final Class<?> clazz)
+    public boolean supports(final Type type)
     {
-        return clazz.isAssignableFrom(BigDecimal.class);
+        return type.getJavaType().isAssignableFrom(BigDecimal.class);
     }
 
     @Override
