@@ -175,9 +175,19 @@ public class ObjectBuilderTest
     @Test
     public void createsListWithTypeReference()
     {
-        final List values = subject.buildInstanceOf(new TypeReference<List<String>>()
+        final List<String> values = subject.buildInstanceOf(new TypeReference<List<String>>()
         {
         }).get();
+
+        assertThat(values).isNotEmpty();
+        assertThat(values).doesNotContainNull();
+    }
+
+    @Test
+    public void createsListWithType()
+    {
+        final Build<List<String>> build = subject.buildInstanceOf(Type.forClass(List.class).withGenerics(String.class).build());
+        final List<String> values = build.get();
 
         assertThat(values).isNotEmpty();
         assertThat(values).doesNotContainNull();
