@@ -52,12 +52,7 @@ public class ObjectBuilder
      */
     public <T> Build<T> buildInstanceOf(final TypeReference<T> typeReference)
     {
-        if (ifNotNull(typeReference).getPath() == null)
-        {
-            return null;
-        }
-
-        return objectFactory.create(typeReference.getPath());
+        return buildInstanceOf(ifNotNull(typeReference).getType());
     }
 
     /**

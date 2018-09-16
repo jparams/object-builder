@@ -2,23 +2,29 @@ package com.jparams.object.builder.type;
 
 import java.lang.reflect.ParameterizedType;
 
-import com.jparams.object.builder.path.Path;
-
-public abstract class TypeReference<T> implements Comparable<T>
+/**
+ * This generic abstract class is used for obtaining full generics type information by sub-classing. Here is one way to instantiate reference
+ * to generic type <code>List&lt;Integer&gt;</code>:
+ *
+ * <pre>
+ *  TypeReference ref = new TypeReference&lt;List&lt;Integer&gt;&gt;() { };
+ * </pre>
+ */
+public abstract class TypeReference<T>
 {
-    private final Path path;
+    private final Type<T> type;
 
     protected TypeReference()
     {
-        this.path = createPath(this);
+        this.type = createType(this);
     }
 
-    public Path getPath()
+    public Type<T> getType()
     {
-        return path;
+        return type;
     }
 
-    private static Path createPath(final TypeReference<?> typeReference)
+    private static <T> Type<T> createType(final TypeReference<T> typeReference)
     {
         if (typeReference.getClass().getGenericSuperclass() instanceof ParameterizedType)
         {
@@ -26,17 +32,11 @@ public abstract class TypeReference<T> implements Comparable<T>
 
             if (types.length > 0)
             {
-                final Type<?> type = TypeResolver.resolve(types[0]);
-                return new Path("$", type, null);
+                @SuppressWarnings("unchecked") final Type<T> resolvedType = (Type<T>) TypeResolver.resolve(types[0]);
+                return resolvedType;
             }
         }
 
         return null;
-    }
-
-    @Override
-    public int compareTo(final T obj)
-    {
-        return 0;
     }
 }

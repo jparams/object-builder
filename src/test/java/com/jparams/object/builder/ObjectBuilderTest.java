@@ -207,7 +207,7 @@ public class ObjectBuilderTest
         assertThat(values).doesNotContainNull();
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void createsNullWithUnknownTypeReference()
     {
         final TypeReference<?> typeReference = new TypeReference()
