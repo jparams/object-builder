@@ -2,7 +2,8 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.jparams/object-builder/badge.svg)](https://search.maven.org/search?q=g:com.jparams%20AND%20a:object-builder)
  [![Build Status](https://travis-ci.org/jparams/object-builder.svg?branch=master)](https://travis-ci.org/jparams/object-builder)
-
+  [![Javadocs](http://www.javadoc.io/badge/com.jparams/object-builder.svg)](http://www.javadoc.io/doc/com.jparams/object-builder)
+  
 ## Getting Started
 
 ### Get Object Builder
@@ -12,13 +13,13 @@ Maven:
 <dependency>
     <groupId>com.jparams</groupId>
     <artifactId>object-builder</artifactId>
-    <version>1.x.x</version>
+    <version>2.x.x</version>
 </dependency>
 ```
 
 Gradle:
 ```
-compile 'com.jparams:object-builder:1.x.x'
+compile 'com.jparams:object-builder:2.x.x'
 ```
 
 ### What is Object Builder?
@@ -34,7 +35,7 @@ Building an object is easy, just configure the builder and let it do the job! He
 ```java
 public class Application {
     public static void main(String[] args) {
-        final ObjectBuilder objectBuilder = ObjectBuilder.withDefaultConfiguration(InjectionStrategy.FIELD_INJECTION);
+        final ObjectBuilder objectBuilder = ObjectBuilder.withDefaultConfiguration();
         final Person person = objectBuilder.buildInstanceOf(Person.class).get();
     }
     

@@ -10,13 +10,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Resolves the type of various java member types and return a {@link Type} object
+ */
 public class TypeResolver
 {
     private TypeResolver()
     {
     }
 
-    public static Type resolve(final Method method)
+    /**
+     * Resolve the return type of method
+     *
+     * @param method method
+     * @return return type
+     */
+    public static Type<?> resolve(final Method method)
     {
         if (method.getReturnType().equals(Void.TYPE))
         {
@@ -26,17 +35,35 @@ public class TypeResolver
         return resolve(method.getGenericReturnType());
     }
 
-    public static Type resolve(final Field field)
+    /**
+     * Resolve the type of a field
+     *
+     * @param field field
+     * @return type
+     */
+    public static Type<?> resolve(final Field field)
     {
         return resolve(field.getGenericType());
     }
 
-    public static Type resolve(final Parameter parameter)
+    /**
+     * Resolve the type of a method parameter
+     *
+     * @param parameter method parameter
+     * @return type
+     */
+    public static Type<?> resolve(final Parameter parameter)
     {
         return resolve(parameter.getParameterizedType());
     }
 
-    public static Type resolve(final java.lang.reflect.Type type)
+    /**
+     * Resolve a Java Type, this maybe a {@link Class} or a {@link ParameterizedType} into a the internal {@link Type} model
+     *
+     * @param type java type
+     * @return type
+     */
+    public static Type<?> resolve(final java.lang.reflect.Type type)
     {
         if (type instanceof ParameterizedType)
         {
@@ -45,20 +72,20 @@ public class TypeResolver
 
         if (type instanceof Class)
         {
-            return new Type((Class<?>) type, Collections.emptyList());
+            return new Type<>((Class<?>) type, Collections.emptyList());
         }
 
         return null;
     }
 
-    private static Type resolve(final ParameterizedType parameterizedType)
+    private static Type<?> resolve(final ParameterizedType parameterizedType)
     {
         final java.lang.reflect.Type type = parameterizedType.getRawType();
-        final List<Type> generics = Arrays.stream(parameterizedType.getActualTypeArguments())
-                                          .map(TypeResolver::resolve)
-                                          .filter(Objects::nonNull)
-                                          .collect(Collectors.toList());
+        final List<Type<?>> generics = Arrays.stream(parameterizedType.getActualTypeArguments())
+                                             .map(TypeResolver::resolve)
+                                             .filter(Objects::nonNull)
+                                             .collect(Collectors.toList());
 
-        return new Type((Class<?>) type, generics);
+        return new Type<>((Class<?>) type, generics);
     }
 }

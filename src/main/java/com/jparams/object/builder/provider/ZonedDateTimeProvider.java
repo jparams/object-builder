@@ -11,7 +11,7 @@ public class ZonedDateTimeProvider implements Provider
     private static final ZoneId UTC = ZoneId.of("UTC");
 
     @Override
-    public boolean supports(final Type type)
+    public boolean supports(final Type<?> type)
     {
         return type.getJavaType().isAssignableFrom(ZonedDateTime.class);
     }

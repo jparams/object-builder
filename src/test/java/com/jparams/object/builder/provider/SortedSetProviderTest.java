@@ -29,8 +29,8 @@ public class SortedSetProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(SortedSet.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(List.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(SortedSet.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(List.class))).isFalse();
     }
 
     @Test
@@ -38,7 +38,7 @@ public class SortedSetProviderTest
     public void testProvideReturnsEmptyOnUnknownGeneric()
     {
         final Context mockContext = mock(Context.class);
-        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(SortedSet.class).build(), null));
+        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(SortedSet.class), null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 
         final SortedSet<?> provided = subject.provide(mockContext);
@@ -51,7 +51,7 @@ public class SortedSetProviderTest
     public void testProvide()
     {
         final Context mockContext = mock(Context.class);
-        final Type type = Type.forClass(SortedSet.class).withGenerics(String.class).build();
+        final Type<?> type = Type.forClass(SortedSet.class).withGenerics(String.class);
         when(mockContext.getPath()).thenReturn(new Path("", type, null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 

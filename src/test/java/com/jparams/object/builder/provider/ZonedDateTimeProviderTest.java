@@ -23,8 +23,8 @@ public class ZonedDateTimeProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(ZonedDateTime.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(LocalDateTime.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(ZonedDateTime.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(LocalDateTime.class))).isFalse();
     }
 
     @Test

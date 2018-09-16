@@ -24,9 +24,9 @@ public class Context
         return path;
     }
 
-    public Object createChild(final String name, final Type memberType)
+    public Object createChild(final String name, final Type<?> type)
     {
-        final Path childPath = new Path(name, memberType, this.path);
+        final Path childPath = new Path(name, type, this.path);
         final Build<Object> build = objectFactory.create(childPath, issueLogger);
         return build.get();
     }

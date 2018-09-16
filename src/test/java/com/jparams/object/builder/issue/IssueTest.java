@@ -12,7 +12,7 @@ public class IssueTest
     @Test
     public void testToString()
     {
-        final Issue issue = new Issue(IssueType.WARNING, "some message", new Path("$", Type.forClass(String.class).build(), null), null);
+        final Issue issue = new Issue(IssueType.WARNING, "some message", new Path("$", Type.forClass(String.class), null), null);
         assertThat(issue).hasToString("WARNING at path: $\n"
                                           + "Message: some message");
     }
@@ -20,7 +20,7 @@ public class IssueTest
     @Test
     public void testToStringWithCause()
     {
-        final Issue issue = new Issue(IssueType.ERROR, "some message", new Path("$", Type.forClass(String.class).build(), null), new Exception("abc"));
+        final Issue issue = new Issue(IssueType.ERROR, "some message", new Path("$", Type.forClass(String.class), null), new Exception("abc"));
         assertThat(issue.toString()).startsWith("ERROR at path: $\n"
                                                     + "Message: some message\n"
                                                     + "Cause:\n"

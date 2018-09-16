@@ -166,18 +166,29 @@ public class ObjectBuilderTest
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void createsEmptyListWhenGenericsNotKnown()
     {
-        final List values = subject.buildInstanceOf(List.class).get();
+        final List<?> values = subject.buildInstanceOf(List.class).get();
         assertThat(values).isEmpty();
     }
 
     @Test
     public void createsListWithTypeReference()
     {
-        final List values = subject.buildInstanceOf(new TypeReference<List<String>>()
+        final List<String> values = subject.buildInstanceOf(new TypeReference<List<String>>()
         {
         }).get();
+
+        assertThat(values).isNotEmpty();
+        assertThat(values).doesNotContainNull();
+    }
+
+    @Test
+    public void createsListWithType()
+    {
+        final Build<List<String>> build = subject.buildInstanceOf(Type.forClass(List.class).withGenerics(String.class));
+        final List<String> values = build.get();
 
         assertThat(values).isNotEmpty();
         assertThat(values).doesNotContainNull();
@@ -186,15 +197,17 @@ public class ObjectBuilderTest
     @Test
     public void createsListWithDeepGenerics()
     {
-        final List values = subject.buildInstanceOf(new TypeReference<List<List<BigDecimal>>>()
+        final Build<List<List<BigDecimal>>> build = subject.buildInstanceOf(new TypeReference<List<List<BigDecimal>>>()
         {
-        }).get();
+        });
+
+        final List<List<BigDecimal>> values = build.get();
 
         assertThat(values).isNotEmpty();
         assertThat(values).doesNotContainNull();
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void createsNullWithUnknownTypeReference()
     {
         final TypeReference<?> typeReference = new TypeReference()
@@ -256,7 +269,7 @@ public class ObjectBuilderTest
     @Test
     public void returnsShallowCopy()
     {
-        final Configuration configuration = Configuration.defaultConfiguration().withCachingAllExcluding(Type.forClass(MyModel.class).build());
+        final Configuration configuration = Configuration.defaultConfiguration().withCachingAllExcluding(Type.forClass(MyModel.class));
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
 
         final MyModel myModel1 = subject.buildInstanceOf(MyModel.class).get();
@@ -270,10 +283,11 @@ public class ObjectBuilderTest
     @SuppressWarnings("unchecked")
     public void createsEmptyMapWhenGenericsNotKnown()
     {
-        final Map values = subject.buildInstanceOf(new TypeReference<Map>()
+        final Build<Map> build = subject.buildInstanceOf(new TypeReference<Map>()
         {
-        }).get();
-        assertThat(values).isEmpty();
+        });
+
+        assertThat(build.get()).isEmpty();
     }
 
     @Test
@@ -320,7 +334,7 @@ public class ObjectBuilderTest
     @Test
     public void createsEmptySetWhenGenericsNotKnown()
     {
-        final Set values = subject.buildInstanceOf(new TypeReference<Set>()
+        final Set<?> values = subject.buildInstanceOf(new TypeReference<Set>()
         {
         }).get();
         assertThat(values).isEmpty();
@@ -370,7 +384,7 @@ public class ObjectBuilderTest
                                                          .withProvider(new Provider()
                                                          {
                                                              @Override
-                                                             public boolean supports(final Type type)
+                                                             public boolean supports(final Type<?> type)
                                                              {
                                                                  return type.getJavaType() == MyModel2.class;
                                                              }
@@ -400,7 +414,7 @@ public class ObjectBuilderTest
     @Test
     public void createsInstanceUsingConstructorInjectionOverridden()
     {
-        final Configuration configuration = Configuration.defaultConfiguration().withBuildStrategy(Type.forClass(MyModel.class).build(), BuildStrategy.CONSTRUCTOR).withDefaultBuildStrategy(BuildStrategy.FIELD_INJECTION);
+        final Configuration configuration = Configuration.defaultConfiguration().withBuildStrategy(Type.forClass(MyModel.class), BuildStrategy.CONSTRUCTOR).withDefaultBuildStrategy(BuildStrategy.FIELD_INJECTION);
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
         final MyModel actual = subject.buildInstanceOf(MyModel.class).get();
         assertThat(actual).isNotNull();
@@ -421,7 +435,7 @@ public class ObjectBuilderTest
     @Test
     public void createsInstanceUsingFieldInjectionOverridden()
     {
-        final Configuration configuration = Configuration.defaultConfiguration().withBuildStrategy(Type.forClass(MyModel.class).build(), BuildStrategy.FIELD_INJECTION).withDefaultBuildStrategy(BuildStrategy.CONSTRUCTOR);
+        final Configuration configuration = Configuration.defaultConfiguration().withBuildStrategy(Type.forClass(MyModel.class), BuildStrategy.FIELD_INJECTION).withDefaultBuildStrategy(BuildStrategy.CONSTRUCTOR);
         final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
         final MyModel actual = subject.buildInstanceOf(MyModel.class).get();
         assertThat(actual).isNotNull();
@@ -431,7 +445,7 @@ public class ObjectBuilderTest
     @Test
     public void returnsPrefabValue()
     {
-        final Configuration configuration = Configuration.defaultConfiguration().withPrefabValue(Type.forClass(float.class).build(), 10F);
+        final Configuration configuration = Configuration.defaultConfiguration().withPrefabValue(Type.forClass(float.class), 10F);
         final float value = ObjectBuilder.withConfiguration(configuration).buildInstanceOf(float.class).get();
         assertThat(value).isEqualTo(10F);
     }
@@ -439,7 +453,7 @@ public class ObjectBuilderTest
     @Test
     public void returnsCacheOnlyValue()
     {
-        final Configuration configuration = Configuration.defaultConfiguration().withCachingOnly(Type.forClass(MyModel.class).build());
+        final Configuration configuration = Configuration.defaultConfiguration().withCachingOnly(Type.forClass(MyModel.class));
         final ObjectBuilder objectBuilder = ObjectBuilder.withConfiguration(configuration);
         final MyModel value = objectBuilder.buildInstanceOf(MyModel.class).get();
         assertThat(value).isNotNull();
@@ -450,7 +464,7 @@ public class ObjectBuilderTest
     @Test
     public void returnsCacheExcludingValue()
     {
-        final Configuration configuration = Configuration.defaultConfiguration().withCachingAllExcluding(Type.forClass(MyModel.class).build());
+        final Configuration configuration = Configuration.defaultConfiguration().withCachingAllExcluding(Type.forClass(MyModel.class));
         final ObjectBuilder objectBuilder = ObjectBuilder.withConfiguration(configuration);
         final MyModel value = objectBuilder.buildInstanceOf(MyModel.class).get();
 

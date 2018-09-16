@@ -29,8 +29,8 @@ public class ConcurrentMapProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(ConcurrentMap.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(List.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(ConcurrentMap.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(List.class))).isFalse();
     }
 
     @Test
@@ -38,7 +38,7 @@ public class ConcurrentMapProviderTest
     public void testProvideReturnsEmptyOnUnknownGeneric()
     {
         final Context mockContext = mock(Context.class);
-        final Type type = Type.forClass(ConcurrentMap.class).build();
+        final Type<?> type = Type.forClass(ConcurrentMap.class);
         when(mockContext.getPath()).thenReturn(new Path("", type, null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 
@@ -52,7 +52,7 @@ public class ConcurrentMapProviderTest
     public void testProvide()
     {
         final Context mockContext = mock(Context.class);
-        final Type type = Type.forClass(ConcurrentMap.class).withGenerics(String.class, String.class).build();
+        final Type<?> type = Type.forClass(ConcurrentMap.class).withGenerics(String.class, String.class);
         when(mockContext.getPath()).thenReturn(new Path("", type, null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 

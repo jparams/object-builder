@@ -21,9 +21,9 @@ public class TypeMapTest
     @Test
     public void testExactMatch()
     {
-        subject.put(Type.forClass(String.class).build(), "found!");
+        subject.put(Type.forClass(String.class), "found!");
 
-        final Optional<String> match = subject.findMatch(Type.forClass(String.class).build());
+        final Optional<String> match = subject.findMatch(Type.forClass(String.class));
 
         assertThat(match).hasValue("found!");
     }
@@ -31,9 +31,9 @@ public class TypeMapTest
     @Test
     public void testExactMatchWithGenerics()
     {
-        subject.put(Type.forClass(List.class).withGenerics(String.class).build(), "found!");
+        subject.put(Type.forClass(List.class).withGenerics(String.class), "found!");
 
-        final Optional<String> match = subject.findMatch(Type.forClass(List.class).withGenerics(String.class).build());
+        final Optional<String> match = subject.findMatch(Type.forClass(List.class).withGenerics(String.class));
 
         assertThat(match).hasValue("found!");
     }
@@ -41,9 +41,9 @@ public class TypeMapTest
     @Test
     public void testBestMatchWithGenericsMissing()
     {
-        subject.put(Type.forClass(List.class).build(), "found!");
+        subject.put(Type.forClass(List.class), "found!");
 
-        final Optional<String> match = subject.findMatch(Type.forClass(List.class).withGenerics(String.class).build());
+        final Optional<String> match = subject.findMatch(Type.forClass(List.class).withGenerics(String.class));
 
         assertThat(match).hasValue("found!");
     }
@@ -51,9 +51,9 @@ public class TypeMapTest
     @Test
     public void testBestMatchWithGenericsMismatch()
     {
-        subject.put(Type.forClass(List.class).withGenerics(Integer.class).build(), "found!");
+        subject.put(Type.forClass(List.class).withGenerics(Integer.class), "found!");
 
-        final Optional<String> match = subject.findMatch(Type.forClass(List.class).withGenerics(String.class).build());
+        final Optional<String> match = subject.findMatch(Type.forClass(List.class).withGenerics(String.class));
 
         assertThat(match).isNotPresent();
     }
@@ -61,7 +61,7 @@ public class TypeMapTest
     @Test
     public void testNoMatch()
     {
-        final Optional<String> match = subject.findMatch(Type.forClass(List.class).build());
+        final Optional<String> match = subject.findMatch(Type.forClass(List.class));
 
         assertThat(match).isNotPresent();
     }

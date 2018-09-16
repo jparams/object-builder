@@ -45,6 +45,12 @@ import com.jparams.object.builder.type.Type;
 import com.jparams.object.builder.type.TypeMap;
 import com.jparams.object.builder.type.TypeSet;
 
+import static com.jparams.object.builder.util.Assertion.ifNotNull;
+
+/**
+ * Provides configuration used by {@link ObjectBuilder}. Create an instance of Configuration with default settings by calling
+ * {@link Configuration#defaultConfiguration()} and apply overrides.
+ */
 public final class Configuration
 {
     private final List<Provider> providers;
@@ -54,7 +60,7 @@ public final class Configuration
     private PathFilter pathFilter;
     private Provider nullProvider;
     private int maxDepth;
-    private Predicate<Type> cachePredicate;
+    private Predicate<Type<?>> cachePredicate;
     private boolean failOnError;
     private boolean failOnWarning;
 
@@ -67,96 +73,214 @@ public final class Configuration
         this.pathFilter = (path) -> true;
         this.nullProvider = new NullProvider();
         this.maxDepth = 15;
-        this.cachePredicate = memberType -> false;
-        this.failOnError = true;
+        this.cachePredicate = type -> false;
+        this.failOnError = false;
         this.failOnWarning = false;
     }
 
+    /**
+     * Define the max depth to which ObjectBuilder should build to. Once the max depth is breached, all subsequent values will be built
+     * as null. This is to avoid infinite recursion. This defaults to 15 if not set.
+     *
+     * @param maxDepth max depth
+     * @return this
+     */
     public Configuration withMaxDepth(final int maxDepth)
     {
         this.maxDepth = maxDepth;
         return this;
     }
 
+    /**
+     * Filter out paths that should not be built. All paths filtered will be built as null.
+     *
+     * @param pathFilter path filter
+     * @return this
+     */
     public Configuration withPathFilter(final PathFilter pathFilter)
     {
-        this.pathFilter = pathFilter;
+        this.pathFilter = ifNotNull(pathFilter);
         return this;
     }
 
+    /**
+     * Configure the provider that will be used to generate null values. This defaults to {@link NullProvider}, which returns null for all class types
+     * and null equivalent values for primitives, such as 0 for int.
+     *
+     * @param nullProvider null provided
+     * @param <T>          provider type
+     * @return this
+     */
     public <T extends AnyValueTypeProvider> Configuration withNullProvider(final T nullProvider)
     {
-        this.nullProvider = nullProvider;
+        this.nullProvider = ifNotNull(nullProvider);
         return this;
     }
 
+    /**
+     * If set to true, the builder will throw an exception on the first occurrence of an error level issue. If set to false, the issue will be logged
+     * and a recovery strategy applied. This is set to false by default.
+     *
+     * @param failOnError fail on error
+     * @return this
+     */
     public Configuration withFailOnError(final boolean failOnError)
     {
         this.failOnError = failOnError;
         return this;
     }
 
+    /**
+     * If set to true, the builder will throw an exception on the first occurrence of an warning level issue. If set to false, the issue will be
+     * logged and a recovery strategy applied. This is set to false by default.
+     *
+     * @param failOnWarning fail on warning
+     * @return this
+     */
     public Configuration withFailOnWarning(final boolean failOnWarning)
     {
         this.failOnWarning = failOnWarning;
         return this;
     }
 
+    /**
+     * Add a custom provider. Providers are prioritised in the order added. User added providers take precedence over the default providers.
+     *
+     * @param provider provider
+     * @return this
+     */
     public Configuration withProvider(final Provider provider)
     {
-        providers.add(provider);
+        providers.add(ifNotNull(provider));
         return this;
     }
 
+    /**
+     * Enable caching of all objects. Once an object of a certain type is built, it will be cached and returned each time that type is
+     * requested. The cache exists for each instance of {@link ObjectBuilder} and not shared across multiple instances. Note, calling one of the
+     * other caching methods such as {@link #withCachingAllExcluding(Type...)}, {@link #withCachingOnly(Type...)}, or
+     * {@link #withCaching(Predicate)}, will unset any settings defined by this method call.
+     *
+     * @return this
+     */
     public Configuration withCacheAll()
     {
         this.cachePredicate = (type) -> true;
         return this;
     }
 
-    public Configuration withCachingOnly(final Type... types)
+    /**
+     * Enable caching only on the given types. Once an object of a certain type is built, it will be cached and returned each time that type is
+     * requested. The cache exists for each instance of {@link ObjectBuilder} and not shared across multiple instances. Note, calling one of the
+     * other caching methods such as {@link #withCachingAllExcluding(Type...)}, {@link #withCacheAll()}, or {@link #withCaching(Predicate)}, will
+     * unset any settings defined by this method call.
+     *
+     * @param types types to cache
+     * @return this
+     */
+    public Configuration withCachingOnly(final Type<?>... types)
     {
         return withCachingOnly(Arrays.asList(types));
     }
 
-    public Configuration withCachingOnly(final Collection<Type> types)
+    /**
+     * Enable caching only on the given types. Once an object of a certain type is built, it will be cached and returned each time that type is
+     * requested. The cache exists for each instance of {@link ObjectBuilder} and not shared across multiple instances. Note, calling one of the
+     * other caching methods such as {@link #withCachingAllExcluding(Type...)}, {@link #withCacheAll()}, or {@link #withCaching(Predicate)}, will
+     * unset any settings defined by this method call.
+     *
+     * @param types types to cache
+     * @return this
+     */
+    public Configuration withCachingOnly(final Collection<Type<?>> types)
     {
         final TypeSet set = new TypeSet(types);
         return withCaching(set::contains);
     }
 
-    public Configuration withCachingAllExcluding(final Type... types)
+    /**
+     * Enable caching on all types excluding these. Once an object of this type is built, it will not be cached, instead the {@link Provider} will
+     * be called each time an object of this type is required. Note, calling one of the other caching methods such as
+     * {@link #withCachingOnly(Type...)}, {@link #withCacheAll()}, or {@link #withCaching(Predicate)}, will unset any settings defined by
+     * this method call.
+     *
+     * @param types types not to cache
+     * @return this
+     */
+    public Configuration withCachingAllExcluding(final Type<?>... types)
     {
         return withCachingAllExcluding(Arrays.asList(types));
     }
 
-    public Configuration withCachingAllExcluding(final Collection<Type> types)
+    /**
+     * Enable caching on all types excluding these. Once an object of this type is built, it will not be cached, instead the {@link Provider} will
+     * be called each time an object of this type is required. Note, calling one of the other caching methods such as
+     * {@link #withCachingOnly(Type...)}, {@link #withCacheAll()}, or {@link #withCaching(Predicate)}, will unset any settings defined by
+     * this method call.
+     *
+     * @param types types not to cache
+     * @return this
+     */
+    public Configuration withCachingAllExcluding(final Collection<Type<?>> types)
     {
         final TypeSet set = new TypeSet(types);
         return withCaching(type -> !set.contains(type));
     }
 
-    public Configuration withCaching(final Predicate<Type> predicate)
+    /**
+     * Enable caching only on all types matching this predicate. Once an object of a matching type is built, it will be cached and returned each time
+     * that type is requested. The cache exists for each instance of {@link ObjectBuilder} and not shared across multiple instances. Note, calling
+     * one of the other caching methods such as {@link #withCachingAllExcluding(Type...)}, {@link #withCacheAll()}, or
+     * {@link #withCachingOnly(Collection)}, will unset any settings defined by this method call.
+     *
+     * @param predicate predicate to decide if a type should be cached
+     * @return this
+     */
+    public Configuration withCaching(final Predicate<Type<?>> predicate)
     {
         this.cachePredicate = predicate;
         return this;
     }
 
-    public <T> Configuration withPrefabValue(final Type type, final T value)
+    /**
+     * Define a prefabricated for a given type. If a value of this type is required, the prefabricated value will be returned, avoid a call to a
+     * suitable {@link Provider}.
+     *
+     * @param type  type
+     * @param value value
+     * @return this
+     */
+    public Configuration withPrefabValue(final Type<?> type, final Object value)
     {
-        this.prefabValueMap.put(type, value);
+        this.prefabValueMap.put(ifNotNull(type), value);
         return this;
     }
 
+    /**
+     * The default build strategy described how objects should be instantiated. These are objects that have not been prefabricated and are not
+     * supported by a specific {@link Provider}. The default build strategy will be used for all types unless a specific build strategy has been
+     * configured at type level by calling {@link Configuration#withBuildStrategy(Type, BuildStrategy)}. If unspecified, the defaultBuildStrategy of
+     * {@link BuildStrategy#AUTO} will be used.
+     *
+     * @param defaultBuildStrategy default build strategy
+     * @return this
+     */
     public Configuration withDefaultBuildStrategy(final BuildStrategy defaultBuildStrategy)
     {
-        this.defaultBuildStrategy = defaultBuildStrategy;
+        this.defaultBuildStrategy = ifNotNull(defaultBuildStrategy);
         return this;
     }
 
-    public Configuration withBuildStrategy(final Type type, final BuildStrategy buildStrategy)
+    /**
+     * This will override the default build strategy set for a specific type.
+     *
+     * @param type          type
+     * @param buildStrategy build strategy
+     * @return this
+     */
+    public Configuration withBuildStrategy(final Type<?> type, final BuildStrategy buildStrategy)
     {
-        this.buildStrategyMap.put(type, buildStrategy);
+        this.buildStrategyMap.put(ifNotNull(type), ifNotNull(buildStrategy));
         return this;
     }
 
@@ -210,6 +334,11 @@ public final class Configuration
         return providers;
     }
 
+    /**
+     * Create a new instance of {@link Configuration} by default settings pre-configured. You can then override the defaults as required.
+     *
+     * @return configuration
+     */
     public static Configuration defaultConfiguration()
     {
         return new Configuration();

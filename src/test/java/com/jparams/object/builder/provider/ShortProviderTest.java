@@ -20,9 +20,9 @@ public class ShortProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(Short.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(short.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(Integer.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(Short.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(short.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(Integer.class))).isFalse();
     }
 
     @Test

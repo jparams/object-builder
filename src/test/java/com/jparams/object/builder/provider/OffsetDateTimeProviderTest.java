@@ -23,8 +23,8 @@ public class OffsetDateTimeProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(OffsetDateTime.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(LocalDateTime.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(OffsetDateTime.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(LocalDateTime.class))).isFalse();
     }
 
     @Test

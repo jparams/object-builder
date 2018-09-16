@@ -27,7 +27,7 @@ public class ObjectProvider implements Provider
     }
 
     @Override
-    public boolean supports(final Type type)
+    public boolean supports(final Type<?> type)
     {
         return !type.getJavaType().isPrimitive() && !type.getJavaType().isEnum() && !type.getJavaType().isInterface() && !Modifier.isAbstract(type.getJavaType().getModifiers());
     }
@@ -85,8 +85,8 @@ public class ObjectProvider implements Provider
         for (int i = 0; i < constructor.getParameters().length; i++)
         {
             final Parameter parameter = constructor.getParameters()[i];
-            final Type memberType = TypeResolver.resolve(parameter);
-            arguments[i] = context.createChild(name + "[" + i + "]", memberType);
+            final Type<?> type = TypeResolver.resolve(parameter);
+            arguments[i] = context.createChild(name + "[" + i + "]", type);
         }
 
         try
@@ -135,8 +135,8 @@ public class ObjectProvider implements Provider
         {
             try
             {
-                final Type memberType = TypeResolver.resolve(field);
-                final Object instance = context.createChild(field.getName(), memberType);
+                final Type<?> type = TypeResolver.resolve(field);
+                final Object instance = context.createChild(field.getName(), type);
                 field.setAccessible(true);
                 field.set(object, instance);
             }

@@ -5,6 +5,9 @@ import java.io.StringWriter;
 
 import com.jparams.object.builder.path.Path;
 
+/**
+ * Issue that occurred during the object build process
+ */
 public class Issue
 {
     private final IssueType issueType;

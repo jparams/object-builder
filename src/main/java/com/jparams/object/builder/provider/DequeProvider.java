@@ -9,7 +9,7 @@ import com.jparams.object.builder.type.Type;
 public class DequeProvider implements Provider
 {
     @Override
-    public boolean supports(final Type type)
+    public boolean supports(final Type<?> type)
     {
         return type.getJavaType().isAssignableFrom(Deque.class);
     }
@@ -25,8 +25,8 @@ public class DequeProvider implements Provider
             return deque;
         }
 
-        final Type memberType = context.getPath().getType().getGenerics().get(0);
-        deque.add(context.createChild("[0]", memberType));
+        final Type<?> type = context.getPath().getType().getGenerics().get(0);
+        deque.add(context.createChild("[0]", type));
         return deque;
     }
 }

@@ -28,8 +28,8 @@ public class ArrayProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(Integer[].class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(Set.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(Integer[].class))).isTrue();
+        assertThat(subject.supports(Type.forClass(Set.class))).isFalse();
     }
 
     @Test
@@ -37,7 +37,7 @@ public class ArrayProviderTest
     public void testProvide()
     {
         final Context mockContext = mock(Context.class);
-        final Type type = Type.forClass(Integer[].class).build();
+        final Type<?> type = Type.forClass(Integer[].class);
         when(mockContext.getPath()).thenReturn(new Path("", type, null));
         when(mockContext.createChild(any(), any())).thenReturn(1);
 
@@ -45,6 +45,6 @@ public class ArrayProviderTest
 
         assertThat(provided).containsExactly(1);
 
-        verify(mockContext).createChild("[0]", Type.forClass(Integer.class).build());
+        verify(mockContext).createChild("[0]", Type.forClass(Integer.class));
     }
 }

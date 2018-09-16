@@ -8,7 +8,7 @@ import com.jparams.object.builder.type.Type;
 public class LocalDateTimeProvider implements Provider
 {
     @Override
-    public boolean supports(final Type type)
+    public boolean supports(final Type<?> type)
     {
         return type.getJavaType().isAssignableFrom(LocalDateTime.class);
     }
