@@ -29,8 +29,8 @@ public class ListProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(List.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(Set.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(List.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(Set.class))).isFalse();
     }
 
     @Test
@@ -38,7 +38,7 @@ public class ListProviderTest
     public void testProvideReturnsEmptyOnUnknownGeneric()
     {
         final Context mockContext = mock(Context.class);
-        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(List.class).build(), null));
+        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(List.class), null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 
         final List<?> provided = subject.provide(mockContext);
@@ -51,7 +51,7 @@ public class ListProviderTest
     public void testProvide()
     {
         final Context mockContext = mock(Context.class);
-        final Type type = Type.forClass(List.class).withGenerics(String.class).build();
+        final Type<?> type = Type.forClass(List.class).withGenerics(String.class);
         when(mockContext.getPath()).thenReturn(new Path("", type, null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 

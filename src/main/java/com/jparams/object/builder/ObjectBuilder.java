@@ -5,6 +5,8 @@ import com.jparams.object.builder.type.Type;
 import com.jparams.object.builder.type.TypeReference;
 import com.jparams.object.builder.type.TypeResolver;
 
+import static com.jparams.object.builder.util.Assertion.ifNotNull;
+
 /**
  * ObjectBuilder can create an instance of any class using a combination of reflection and pre-defined value providers. This can be used to
  * generate dummy instances of objects. You can use ObjectBuilder as follows:
@@ -31,7 +33,7 @@ public class ObjectBuilder
      */
     public <T> Build<T> buildInstanceOf(final Class<T> clazz)
     {
-        final Type type = TypeResolver.resolve(clazz);
+        final Type<?> type = TypeResolver.resolve(ifNotNull(clazz));
         final Path path = new Path("$", type, null);
         return objectFactory.create(path);
     }
@@ -50,7 +52,7 @@ public class ObjectBuilder
      */
     public <T> Build<T> buildInstanceOf(final TypeReference<T> typeReference)
     {
-        if (typeReference == null || typeReference.getPath() == null)
+        if (ifNotNull(typeReference).getPath() == null)
         {
             return null;
         }
@@ -63,21 +65,17 @@ public class ObjectBuilder
      * supports creation of an object with generics. Example:
      *
      * <pre>
-     *  ObjectBuilder.withDefaultConfiguration().buildInstanceOf(Type.forClass(List.class).withGenerics(String.class).build());
+     *  ObjectBuilder.withDefaultConfiguration().buildInstanceOf(Type.forClass(List.class).withGenerics(String.class));
      * </pre>
      *
      * @param type type
      * @param <T>  type
+     * @param <R>  return type
      * @return build
      */
-    public <T> Build<T> buildInstanceOf(final Type type)
+    public <T, R extends T> Build<R> buildInstanceOf(final Type<T> type)
     {
-        if (type == null)
-        {
-            return null;
-        }
-
-        final Path path = new Path("$", type, null);
+        final Path path = new Path("$", ifNotNull(type), null);
         return objectFactory.create(path);
     }
 

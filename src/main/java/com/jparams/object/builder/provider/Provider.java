@@ -14,7 +14,7 @@ public interface Provider
      * @param type class to test
      * @return true if supported
      */
-    boolean supports(Type type);
+    boolean supports(Type<?> type);
 
     /**
      * Provide a generated value in given context

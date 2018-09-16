@@ -29,8 +29,8 @@ public class SortedMapProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(SortedMap.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(List.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(SortedMap.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(List.class))).isFalse();
     }
 
     @Test
@@ -38,7 +38,7 @@ public class SortedMapProviderTest
     public void testProvideReturnsEmptyOnUnknownGeneric()
     {
         final Context mockContext = mock(Context.class);
-        final Type type = Type.forClass(SortedMap.class).build();
+        final Type<?> type = Type.forClass(SortedMap.class);
         when(mockContext.getPath()).thenReturn(new Path("", type, null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 
@@ -52,7 +52,7 @@ public class SortedMapProviderTest
     public void testProvide()
     {
         final Context mockContext = mock(Context.class);
-        final Type type = Type.forClass(SortedMap.class).withGenerics(String.class, String.class).build();
+        final Type<?> type = Type.forClass(SortedMap.class).withGenerics(String.class, String.class);
         when(mockContext.getPath()).thenReturn(new Path("", type, null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 

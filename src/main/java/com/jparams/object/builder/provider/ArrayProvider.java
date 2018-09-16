@@ -9,7 +9,7 @@ import com.jparams.object.builder.type.TypeResolver;
 public class ArrayProvider implements Provider
 {
     @Override
-    public boolean supports(final Type type)
+    public boolean supports(final Type<?> type)
     {
         return type.getJavaType().isArray();
     }
@@ -18,9 +18,9 @@ public class ArrayProvider implements Provider
     public Object[] provide(final Context context)
     {
         final Class<?> componentType = context.getPath().getType().getJavaType().getComponentType();
-        final Type memberType = TypeResolver.resolve(componentType);
+        final Type<?> type = TypeResolver.resolve(componentType);
         final Object[] array = (Object[]) Array.newInstance(componentType, 1);
-        array[0] = context.createChild("[0]", memberType);
+        array[0] = context.createChild("[0]", type);
         return array;
     }
 }

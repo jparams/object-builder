@@ -8,7 +8,7 @@ import com.jparams.object.builder.type.Type;
 public class CharProvider implements Provider
 {
     @Override
-    public boolean supports(final Type type)
+    public boolean supports(final Type<?> type)
     {
         return type.getJavaType().isAssignableFrom(Character.class) || type.getJavaType().isAssignableFrom(char.class);
     }

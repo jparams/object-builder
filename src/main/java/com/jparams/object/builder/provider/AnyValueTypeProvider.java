@@ -8,7 +8,7 @@ import com.jparams.object.builder.type.Type;
 public abstract class AnyValueTypeProvider implements Provider
 {
     @Override
-    public final boolean supports(final Type type)
+    public final boolean supports(final Type<?> type)
     {
         return true;
     }

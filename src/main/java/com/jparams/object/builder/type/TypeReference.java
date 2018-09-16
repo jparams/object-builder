@@ -26,8 +26,8 @@ public abstract class TypeReference<T> implements Comparable<T>
 
             if (types.length > 0)
             {
-                final Type memberType = TypeResolver.resolve(types[0]);
-                return new Path("$", memberType, null);
+                final Type<?> type = TypeResolver.resolve(types[0]);
+                return new Path("$", type, null);
             }
         }
 

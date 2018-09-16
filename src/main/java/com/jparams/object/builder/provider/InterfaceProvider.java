@@ -14,7 +14,7 @@ import com.jparams.object.builder.type.TypeResolver;
 public class InterfaceProvider implements Provider
 {
     @Override
-    public boolean supports(final Type type)
+    public boolean supports(final Type<?> type)
     {
         return type.getJavaType().isInterface();
     }
@@ -46,15 +46,15 @@ public class InterfaceProvider implements Provider
             }
 
             final String methodName = String.format("%s(%s)", method.getName(), args == null || args.length == 0 ? "" : Arrays.toString(args));
-            final Type memberType = TypeResolver.resolve(method);
+            final Type<?> type = TypeResolver.resolve(method);
 
-            if (memberType == null)
+            if (type == null)
             {
                 cache.put(method, null);
                 return null;
             }
 
-            final Object returnValue = context.createChild(methodName, memberType);
+            final Object returnValue = context.createChild(methodName, type);
             cache.put(method, returnValue);
             return returnValue;
         }

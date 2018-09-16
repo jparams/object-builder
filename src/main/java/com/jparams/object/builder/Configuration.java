@@ -60,7 +60,7 @@ public final class Configuration
     private PathFilter pathFilter;
     private Provider nullProvider;
     private int maxDepth;
-    private Predicate<Type> cachePredicate;
+    private Predicate<Type<?>> cachePredicate;
     private boolean failOnError;
     private boolean failOnWarning;
 
@@ -73,7 +73,7 @@ public final class Configuration
         this.pathFilter = (path) -> true;
         this.nullProvider = new NullProvider();
         this.maxDepth = 15;
-        this.cachePredicate = memberType -> false;
+        this.cachePredicate = type -> false;
         this.failOnError = false;
         this.failOnWarning = false;
     }
@@ -178,7 +178,7 @@ public final class Configuration
      * @param types types to cache
      * @return this
      */
-    public Configuration withCachingOnly(final Type... types)
+    public Configuration withCachingOnly(final Type<?>... types)
     {
         return withCachingOnly(Arrays.asList(types));
     }
@@ -192,7 +192,7 @@ public final class Configuration
      * @param types types to cache
      * @return this
      */
-    public Configuration withCachingOnly(final Collection<Type> types)
+    public Configuration withCachingOnly(final Collection<Type<?>> types)
     {
         final TypeSet set = new TypeSet(types);
         return withCaching(set::contains);
@@ -207,7 +207,7 @@ public final class Configuration
      * @param types types not to cache
      * @return this
      */
-    public Configuration withCachingAllExcluding(final Type... types)
+    public Configuration withCachingAllExcluding(final Type<?>... types)
     {
         return withCachingAllExcluding(Arrays.asList(types));
     }
@@ -221,7 +221,7 @@ public final class Configuration
      * @param types types not to cache
      * @return this
      */
-    public Configuration withCachingAllExcluding(final Collection<Type> types)
+    public Configuration withCachingAllExcluding(final Collection<Type<?>> types)
     {
         final TypeSet set = new TypeSet(types);
         return withCaching(type -> !set.contains(type));
@@ -236,7 +236,7 @@ public final class Configuration
      * @param predicate predicate to decide if a type should be cached
      * @return this
      */
-    public Configuration withCaching(final Predicate<Type> predicate)
+    public Configuration withCaching(final Predicate<Type<?>> predicate)
     {
         this.cachePredicate = predicate;
         return this;
@@ -250,7 +250,7 @@ public final class Configuration
      * @param value value
      * @return this
      */
-    public Configuration withPrefabValue(final Type type, final Object value)
+    public Configuration withPrefabValue(final Type<?> type, final Object value)
     {
         this.prefabValueMap.put(ifNotNull(type), value);
         return this;
@@ -278,7 +278,7 @@ public final class Configuration
      * @param buildStrategy build strategy
      * @return this
      */
-    public Configuration withBuildStrategy(final Type type, final BuildStrategy buildStrategy)
+    public Configuration withBuildStrategy(final Type<?> type, final BuildStrategy buildStrategy)
     {
         this.buildStrategyMap.put(ifNotNull(type), ifNotNull(buildStrategy));
         return this;

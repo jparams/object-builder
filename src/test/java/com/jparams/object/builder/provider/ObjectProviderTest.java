@@ -47,29 +47,29 @@ public class ObjectProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(MyModel.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(int.class).build())).isFalse();
-        assertThat(subject.supports(Type.forClass(MyEnum.class).build())).isFalse();
-        assertThat(subject.supports(Type.forClass(MyInterface.class).build())).isFalse();
-        assertThat(subject.supports(Type.forClass(MyAbstractModel.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(MyModel.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(int.class))).isFalse();
+        assertThat(subject.supports(Type.forClass(MyEnum.class))).isFalse();
+        assertThat(subject.supports(Type.forClass(MyInterface.class))).isFalse();
+        assertThat(subject.supports(Type.forClass(MyAbstractModel.class))).isFalse();
     }
 
     @Test
     public void testProvideUsingConstructorInjection()
     {
-        when(mockTypeMap.findMatch(Type.forClass(MyModel.class).build())).thenReturn(Optional.of(BuildStrategy.CONSTRUCTOR));
+        when(mockTypeMap.findMatch(Type.forClass(MyModel.class))).thenReturn(Optional.of(BuildStrategy.CONSTRUCTOR));
 
         final Context mockContext = mock(Context.class);
-        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(MyModel.class).build(), null));
+        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(MyModel.class), null));
 
         final String field1 = "abc";
-        when(mockContext.createChild(any(), eq(Type.forClass(String.class).build()))).thenReturn(field1);
+        when(mockContext.createChild(any(), eq(Type.forClass(String.class)))).thenReturn(field1);
 
         final List<Object> field2 = Collections.emptyList();
-        when(mockContext.createChild(any(), eq(Type.forClass(List.class).withGenerics(MyModel2.class).build()))).thenReturn(field2);
+        when(mockContext.createChild(any(), eq(Type.forClass(List.class).withGenerics(MyModel2.class)))).thenReturn(field2);
 
         final Set<BigDecimal> field3 = Collections.singleton(BigDecimal.ONE);
-        when(mockContext.createChild(any(), eq(Type.forClass(Set.class).withGenerics(BigDecimal.class).build()))).thenReturn(field3);
+        when(mockContext.createChild(any(), eq(Type.forClass(Set.class).withGenerics(BigDecimal.class)))).thenReturn(field3);
 
         final MyModel provided = (MyModel) subject.provide(mockContext);
         assertThat(provided.getField1()).isEqualTo("--" + field1);
@@ -81,22 +81,22 @@ public class ObjectProviderTest
     @Test
     public void testProvideUsingFieldInjection()
     {
-        when(mockTypeMap.findMatch(Type.forClass(MyModel.class).build())).thenReturn(Optional.of(BuildStrategy.FIELD_INJECTION));
+        when(mockTypeMap.findMatch(Type.forClass(MyModel.class))).thenReturn(Optional.of(BuildStrategy.FIELD_INJECTION));
 
         final Context mockContext = mock(Context.class);
-        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(MyModel.class).build(), null));
+        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(MyModel.class), null));
 
         final String field1 = "abc";
-        when(mockContext.createChild(any(), eq(Type.forClass(String.class).build()))).thenReturn(field1);
+        when(mockContext.createChild(any(), eq(Type.forClass(String.class)))).thenReturn(field1);
 
         final List<Object> field2 = Collections.emptyList();
-        when(mockContext.createChild(any(), eq(Type.forClass(List.class).withGenerics(MyModel2.class).build()))).thenReturn(field2);
+        when(mockContext.createChild(any(), eq(Type.forClass(List.class).withGenerics(MyModel2.class)))).thenReturn(field2);
 
         final Set<BigDecimal> field3 = Collections.singleton(BigDecimal.ONE);
-        when(mockContext.createChild(any(), eq(Type.forClass(Set.class).withGenerics(BigDecimal.class).build()))).thenReturn(field3);
+        when(mockContext.createChild(any(), eq(Type.forClass(Set.class).withGenerics(BigDecimal.class)))).thenReturn(field3);
 
         final MyModel field4 = mock(MyModel.class);
-        when(mockContext.createChild(any(), eq(Type.forClass(MyModel.class).build()))).thenReturn(field4);
+        when(mockContext.createChild(any(), eq(Type.forClass(MyModel.class)))).thenReturn(field4);
 
         final MyModel provided = (MyModel) subject.provide(mockContext);
         assertThat(provided.getField1()).isEqualTo(field1);
@@ -108,22 +108,22 @@ public class ObjectProviderTest
     @Test
     public void testProvideUsingAuto()
     {
-        when(mockTypeMap.findMatch(Type.forClass(MyModel.class).build())).thenReturn(Optional.empty());
+        when(mockTypeMap.findMatch(Type.forClass(MyModel.class))).thenReturn(Optional.empty());
 
         final Context mockContext = mock(Context.class);
-        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(MyModel.class).build(), null));
+        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(MyModel.class), null));
 
         final String field1 = "abc";
-        when(mockContext.createChild(any(), eq(Type.forClass(String.class).build()))).thenReturn(field1);
+        when(mockContext.createChild(any(), eq(Type.forClass(String.class)))).thenReturn(field1);
 
         final List<Object> field2 = Collections.emptyList();
-        when(mockContext.createChild(any(), eq(Type.forClass(List.class).withGenerics(MyModel2.class).build()))).thenReturn(field2);
+        when(mockContext.createChild(any(), eq(Type.forClass(List.class).withGenerics(MyModel2.class)))).thenReturn(field2);
 
         final Set<BigDecimal> field3 = Collections.singleton(BigDecimal.ONE);
-        when(mockContext.createChild(any(), eq(Type.forClass(Set.class).withGenerics(BigDecimal.class).build()))).thenReturn(new ArrayList<>(field3)).thenReturn(field3);
+        when(mockContext.createChild(any(), eq(Type.forClass(Set.class).withGenerics(BigDecimal.class)))).thenReturn(new ArrayList<>(field3)).thenReturn(field3);
 
         final MyModel field4 = mock(MyModel.class);
-        when(mockContext.createChild(any(), eq(Type.forClass(MyModel.class).build()))).thenReturn(field4);
+        when(mockContext.createChild(any(), eq(Type.forClass(MyModel.class)))).thenReturn(field4);
 
         final MyModel provided = (MyModel) subject.provide(mockContext);
         assertThat(provided.getField1()).isEqualTo(field1);

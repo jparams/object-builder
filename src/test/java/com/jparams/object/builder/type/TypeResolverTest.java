@@ -16,15 +16,15 @@ public class TypeResolverTest
     public void testResolveMethod() throws NoSuchMethodException
     {
         final Method method = DummyClass.class.getDeclaredMethod("getStringList");
-        final Type type = TypeResolver.resolve(method);
-        assertThat(type).isEqualTo(Type.forClass(List.class).withGenerics(Type.forClass(Collection.class).withGenerics(String.class).build()).build());
+        final Type<?> type = TypeResolver.resolve(method);
+        assertThat(type).isEqualTo(Type.forClass(List.class).withGenerics(Type.forClass(Collection.class).withGenerics(String.class)));
     }
 
     @Test
     public void testResolveNullOnVoidMethod() throws NoSuchMethodException
     {
         final Method method = DummyClass.class.getDeclaredMethod("myVoidMethod", List.class);
-        final Type type = TypeResolver.resolve(method);
+        final Type<?> type = TypeResolver.resolve(method);
         assertThat(type).isNull();
     }
 
@@ -32,23 +32,23 @@ public class TypeResolverTest
     public void testResolveField() throws NoSuchFieldException
     {
         final Field field = DummyClass.class.getDeclaredField("stringList");
-        final Type type = TypeResolver.resolve(field);
-        assertThat(type).isEqualTo(Type.forClass(List.class).withGenerics(Type.forClass(Collection.class).withGenerics(String.class).build()).build());
+        final Type<?> type = TypeResolver.resolve(field);
+        assertThat(type).isEqualTo(Type.forClass(List.class).withGenerics(Type.forClass(Collection.class).withGenerics(String.class)));
     }
 
     @Test
     public void testResolveParameter() throws NoSuchMethodException
     {
         final Method method = DummyClass.class.getDeclaredMethod("myVoidMethod", List.class);
-        final Type type = TypeResolver.resolve(method.getParameters()[0]);
-        assertThat(type).isEqualTo(Type.forClass(List.class).withGenerics(Type.forClass(Collection.class).withGenerics(String.class).build()).build());
+        final Type<?> type = TypeResolver.resolve(method.getParameters()[0]);
+        assertThat(type).isEqualTo(Type.forClass(List.class).withGenerics(Type.forClass(Collection.class).withGenerics(String.class)));
     }
 
     @Test
     public void testResolveClass()
     {
-        final Type type = TypeResolver.resolve(String.class);
-        assertThat(type).isEqualTo(Type.forClass(String.class).build());
+        final Type<?> type = TypeResolver.resolve(String.class);
+        assertThat(type).isEqualTo(Type.forClass(String.class));
     }
 
     @SuppressWarnings("unchecked")
@@ -61,7 +61,7 @@ public class TypeResolverTest
             return stringList;
         }
 
-        void myVoidMethod(List<Collection<String>> stringList)
+        void myVoidMethod(final List<Collection<String>> stringList)
         {
             this.stringList = stringList;
         }

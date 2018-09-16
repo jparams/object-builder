@@ -7,18 +7,18 @@ import java.util.Optional;
 
 public class TypeMap<V>
 {
-    private final Map<Type, V> map = new LinkedHashMap<>();
+    private final Map<Type<?>, V> map = new LinkedHashMap<>();
 
     public TypeMap()
     {
     }
 
-    public void put(final Type type, final V value)
+    public void put(final Type<?> type, final V value)
     {
         map.put(type, value);
     }
 
-    public Optional<V> findMatch(final Type type)
+    public Optional<V> findMatch(final Type<?> type)
     {
         if (map.containsKey(type))
         {

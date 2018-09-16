@@ -29,8 +29,8 @@ public class MapProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(Map.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(List.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(Map.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(List.class))).isFalse();
     }
 
     @Test
@@ -38,7 +38,7 @@ public class MapProviderTest
     public void testProvideReturnsEmptyOnUnknownGeneric()
     {
         final Context mockContext = mock(Context.class);
-        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(Map.class).build(), null));
+        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(Map.class), null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 
         final Map<?, ?> provided = subject.provide(mockContext);
@@ -51,7 +51,7 @@ public class MapProviderTest
     public void testProvide()
     {
         final Context mockContext = mock(Context.class);
-        final Type type = Type.forClass(Map.class).withGenerics(String.class, String.class).build();
+        final Type<?> type = Type.forClass(Map.class).withGenerics(String.class, String.class);
         when(mockContext.getPath()).thenReturn(new Path("", type, null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 

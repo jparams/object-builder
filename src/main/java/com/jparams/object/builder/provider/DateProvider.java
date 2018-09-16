@@ -1,6 +1,6 @@
 package com.jparams.object.builder.provider;
 
-import java.util.Date;
+import java.sql.Date;
 
 import com.jparams.object.builder.Context;
 import com.jparams.object.builder.type.Type;
@@ -8,7 +8,7 @@ import com.jparams.object.builder.type.Type;
 public class DateProvider implements Provider
 {
     @Override
-    public boolean supports(final Type type)
+    public boolean supports(final Type<?> type)
     {
         return type.getJavaType().isAssignableFrom(Date.class);
     }
@@ -16,6 +16,7 @@ public class DateProvider implements Provider
     @Override
     public Date provide(final Context context)
     {
-        return new Date();
+        final long time = new java.util.Date().getTime();
+        return new Date(time);
     }
 }

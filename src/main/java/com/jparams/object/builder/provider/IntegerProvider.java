@@ -10,7 +10,7 @@ public class IntegerProvider implements Provider
     private final Random random = new Random();
 
     @Override
-    public boolean supports(final Type type)
+    public boolean supports(final Type<?> type)
     {
         return type.getJavaType().isAssignableFrom(Integer.class) || type.getJavaType().isAssignableFrom(int.class);
     }

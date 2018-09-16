@@ -24,9 +24,9 @@ public class PrefabValueProviderTest
     public void setUp()
     {
         final TypeMap<Object> prefabValueMap = new TypeMap<>();
-        prefabValueMap.put(Type.forClass(String.class).build(), "abc");
-        prefabValueMap.put(Type.forClass(List.class).build(), Collections.emptyList());
-        prefabValueMap.put(Type.forClass(List.class).withGenerics(String.class).build(), Collections.singletonList("abc"));
+        prefabValueMap.put(Type.forClass(String.class), "abc");
+        prefabValueMap.put(Type.forClass(List.class), Collections.emptyList());
+        prefabValueMap.put(Type.forClass(List.class).withGenerics(String.class), Collections.singletonList("abc"));
 
         subject = new PrefabValueProvider(prefabValueMap);
     }
@@ -34,22 +34,22 @@ public class PrefabValueProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(String.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(List.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(List.class).withGenerics(String.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(List.class).withGenerics(Integer.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(Set.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(String.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(List.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(List.class).withGenerics(String.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(List.class).withGenerics(Integer.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(Set.class))).isFalse();
     }
 
     @Test
     public void testProvide()
     {
         final Context mockContext = mock(Context.class);
-        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(String.class).build(), null))
-                                   .thenReturn(new Path("", Type.forClass(List.class).build(), null))
-                                   .thenReturn(new Path("", Type.forClass(List.class).withGenerics(String.class).build(), null))
-                                   .thenReturn(new Path("", Type.forClass(List.class).withGenerics(Integer.class).build(), null))
-                                   .thenReturn(new Path("", Type.forClass(Set.class).build(), null));
+        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(String.class), null))
+                                   .thenReturn(new Path("", Type.forClass(List.class), null))
+                                   .thenReturn(new Path("", Type.forClass(List.class).withGenerics(String.class), null))
+                                   .thenReturn(new Path("", Type.forClass(List.class).withGenerics(Integer.class), null))
+                                   .thenReturn(new Path("", Type.forClass(Set.class), null));
 
         assertThat(subject.provide(mockContext)).isEqualTo("abc");
         assertThat(subject.provide(mockContext)).isEqualTo(Collections.emptyList());

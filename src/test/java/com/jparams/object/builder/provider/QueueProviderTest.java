@@ -30,8 +30,8 @@ public class QueueProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(Queue.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(List.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(Queue.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(List.class))).isFalse();
     }
 
     @Test
@@ -39,7 +39,7 @@ public class QueueProviderTest
     public void testProvideReturnsEmptyOnUnknownGeneric()
     {
         final Context mockContext = mock(Context.class);
-        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(Queue.class).build(), null));
+        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(Queue.class), null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 
         final Queue<?> provided = subject.provide(mockContext);
@@ -52,7 +52,7 @@ public class QueueProviderTest
     public void testProvide()
     {
         final Context mockContext = mock(Context.class);
-        final Type type = Type.forClass(Vector.class).withGenerics(Queue.class).build();
+        final Type<?> type = Type.forClass(Vector.class).withGenerics(Queue.class);
         when(mockContext.getPath()).thenReturn(new Path("", type, null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 

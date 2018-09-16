@@ -29,8 +29,8 @@ public class VectorProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(Vector.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(Set.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(Vector.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(Set.class))).isFalse();
     }
 
     @Test
@@ -38,7 +38,7 @@ public class VectorProviderTest
     public void testProvideReturnsEmptyOnUnknownGeneric()
     {
         final Context mockContext = mock(Context.class);
-        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(Vector.class).build(), null));
+        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(Vector.class), null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 
         final Vector<?> provided = subject.provide(mockContext);
@@ -51,7 +51,7 @@ public class VectorProviderTest
     public void testProvide()
     {
         final Context mockContext = mock(Context.class);
-        final Type type = Type.forClass(Vector.class).withGenerics(String.class).build();
+        final Type<?> type = Type.forClass(Vector.class).withGenerics(String.class);
         when(mockContext.getPath()).thenReturn(new Path("", type, null));
         when(mockContext.createChild(any(), any())).thenReturn("abc");
 

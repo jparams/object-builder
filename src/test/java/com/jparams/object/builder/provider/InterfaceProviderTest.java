@@ -29,29 +29,29 @@ public class InterfaceProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(MyInterface.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(String.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(MyInterface.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(String.class))).isFalse();
     }
 
     @Test
     public void testProvide()
     {
         final Context mockContext = mock(Context.class);
-        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(MyInterface.class).build(), null));
-        when(mockContext.createChild(any(), eq(Type.forClass(String.class).build()))).thenReturn("abc");
+        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(MyInterface.class), null));
+        when(mockContext.createChild(any(), eq(Type.forClass(String.class)))).thenReturn("abc");
 
         final MyInterface provided = (MyInterface) subject.provide(mockContext);
         assertThat(provided.generateString()).isEqualTo("abc");
         assertThat(provided.generateString()).isEqualTo("abc");
 
-        verify(mockContext, times(1)).createChild(any(), eq(Type.forClass(String.class).build()));
+        verify(mockContext, times(1)).createChild(any(), eq(Type.forClass(String.class)));
     }
 
     @Test
     public void testProvideHandlesVoid()
     {
         final Context mockContext = mock(Context.class);
-        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(MyInterface.class).build(), null));
+        when(mockContext.getPath()).thenReturn(new Path("", Type.forClass(MyInterface.class), null));
 
         final MyInterface provided = (MyInterface) subject.provide(mockContext);
         provided.voidMethod();

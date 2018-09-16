@@ -17,7 +17,7 @@ public class PrefabValueProvider implements Provider
     }
 
     @Override
-    public boolean supports(final Type type)
+    public boolean supports(final Type<?> type)
     {
         return prefabValueMap.findMatch(type).isPresent();
     }

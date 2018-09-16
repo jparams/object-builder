@@ -4,16 +4,19 @@ import java.util.Objects;
 
 import com.jparams.object.builder.type.Type;
 
+/**
+ * Path on a class
+ */
 public class Path
 {
     private final String name;
-    private final Type memberType;
+    private final Type<?> type;
     private final Path parent;
 
-    public Path(final String name, final Type memberType, final Path parent)
+    public Path(final String name, final Type<?> type, final Path parent)
     {
         this.name = name;
-        this.memberType = memberType;
+        this.type = type;
         this.parent = parent;
     }
 
@@ -22,9 +25,9 @@ public class Path
         return name;
     }
 
-    public Type getType()
+    public Type<?> getType()
     {
-        return memberType;
+        return type;
     }
 
     public Path getParent()
@@ -37,6 +40,11 @@ public class Path
         return parent == null ? 0 : parent.getDepth() + 1;
     }
 
+    /**
+     * Location from the base path
+     *
+     * @return location
+     */
     public String getLocation()
     {
         return parent == null ? name : parent.getLocation() + "." + name;
@@ -57,14 +65,14 @@ public class Path
 
         final Path path = (Path) o;
         return Objects.equals(name, path.name)
-            && Objects.equals(memberType, path.memberType)
+            && Objects.equals(type, path.type)
             && Objects.equals(parent, path.parent);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(name, memberType, parent);
+        return Objects.hash(name, type, parent);
     }
 
     @Override

@@ -20,8 +20,9 @@ public class StringProviderTest
     @Test
     public void testSupports()
     {
-        assertThat(subject.supports(Type.forClass(String.class).build())).isTrue();
-        assertThat(subject.supports(Type.forClass(Integer.class).build())).isFalse();
+        assertThat(subject.supports(Type.forClass(String.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(CharSequence.class))).isTrue();
+        assertThat(subject.supports(Type.forClass(Integer.class))).isFalse();
     }
 
     @Test

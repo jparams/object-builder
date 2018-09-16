@@ -8,7 +8,7 @@ import com.jparams.object.builder.type.Type;
 public class VectorProvider implements Provider
 {
     @Override
-    public boolean supports(final Type type)
+    public boolean supports(final Type<?> type)
     {
         return type.getJavaType().isAssignableFrom(Vector.class);
     }
@@ -24,8 +24,8 @@ public class VectorProvider implements Provider
             return vector;
         }
 
-        final Type memberType = context.getPath().getType().getGenerics().get(0);
-        vector.add(context.createChild("[0]", memberType));
+        final Type<?> type = context.getPath().getType().getGenerics().get(0);
+        vector.add(context.createChild("[0]", type));
         return vector;
     }
 }
