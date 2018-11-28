@@ -24,7 +24,7 @@ public class SortedSetProvider implements Provider
             return new TreeSet<>();
         }
 
-        final Type<?> type = context.getPath().getType().getGenerics().get(0);
+        final Type<?> type = context.getPath().getType().getGenerics().get(0).getType();
         final Object child = context.createChild("[0]", type);
         return new TreeSet<>(Collections.singletonList(child));
     }

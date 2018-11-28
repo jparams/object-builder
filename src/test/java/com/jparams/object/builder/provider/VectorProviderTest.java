@@ -59,6 +59,6 @@ public class VectorProviderTest
 
         assertThat((Vector) provided).containsExactly("abc");
 
-        verify(mockContext).createChild("[0]", type.getGenerics().get(0));
+        verify(mockContext).createChild("[0]", type.getGenerics().get(0).getType());
     }
 }

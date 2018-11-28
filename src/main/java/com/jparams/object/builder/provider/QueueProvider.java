@@ -25,7 +25,7 @@ public class QueueProvider implements Provider
             return queue;
         }
 
-        final Type<?> type = context.getPath().getType().getGenerics().get(0);
+        final Type<?> type = context.getPath().getType().getGenerics().get(0).getType();
         queue.add(context.createChild("[0]", type));
         return queue;
     }

@@ -33,7 +33,7 @@ public class ObjectBuilder
      */
     public <T> Build<T> buildInstanceOf(final Class<T> clazz)
     {
-        final Type<?> type = TypeResolver.resolve(ifNotNull(clazz));
+        final Type<?> type = TypeResolver.resolveType(ifNotNull(clazz));
         final Path path = new Path("$", type, null);
         return objectFactory.create(path);
     }

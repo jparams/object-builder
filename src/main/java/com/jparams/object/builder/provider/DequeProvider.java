@@ -25,7 +25,7 @@ public class DequeProvider implements Provider
             return deque;
         }
 
-        final Type<?> type = context.getPath().getType().getGenerics().get(0);
+        final Type<?> type = context.getPath().getType().getGenerics().get(0).getType();
         deque.add(context.createChild("[0]", type));
         return deque;
     }

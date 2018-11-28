@@ -16,6 +16,8 @@ import com.jparams.object.builder.model.MyInterface;
 import com.jparams.object.builder.model.MyModel;
 import com.jparams.object.builder.model.MyModel2;
 import com.jparams.object.builder.model.MyModel3;
+import com.jparams.object.builder.model.MyModel5;
+import com.jparams.object.builder.model.MyModel6;
 import com.jparams.object.builder.provider.Provider;
 import com.jparams.object.builder.type.Type;
 import com.jparams.object.builder.type.TypeReference;
@@ -477,5 +479,33 @@ public class ObjectBuilderTest
         assertThat(value).isNotSameAs(rebuild2).isEqualToComparingFieldByFieldRecursively(rebuild2);
 
         assertThat(rebuild1).isNotSameAs(rebuild2).isEqualToComparingFieldByFieldRecursively(rebuild2);
+    }
+
+    @Test
+    public void buildsClassWithGeneric()
+    {
+        final Build<MyModel5<String>> build = subject.buildInstanceOf(new TypeReference<MyModel5<String>>()
+        {
+        });
+
+        assertThat(build.get().getObj().getObj()).isNotNull();
+    }
+
+    @Test
+    public void buildsClassThatExtendsClassWithGenericUsingConstructorInjection()
+    {
+        final Build<MyModel6> build = subject.buildInstanceOf(MyModel6.class);
+
+        assertThat(build.get().getObj().getObj()).isNotNull();
+    }
+
+    @Test
+    public void buildsClassThatExtendsClassWithGenericUsingFieldInjection()
+    {
+        final Configuration configuration = Configuration.defaultConfiguration().withDefaultBuildStrategy(BuildStrategy.FIELD_INJECTION);
+        final ObjectBuilder subject = ObjectBuilder.withConfiguration(configuration);
+        final Build<MyModel6> build = subject.buildInstanceOf(MyModel6.class);
+
+        assertThat(build.get().getObj().getObj()).isNotNull();
     }
 }
