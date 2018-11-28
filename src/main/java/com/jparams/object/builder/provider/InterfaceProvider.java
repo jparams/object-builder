@@ -46,7 +46,7 @@ public class InterfaceProvider implements Provider
             }
 
             final String methodName = String.format("%s(%s)", method.getName(), args == null || args.length == 0 ? "" : Arrays.toString(args));
-            final Type<?> type = TypeResolver.resolve(method);
+            final Type<?> type = TypeResolver.resolveReturnType(context.getPath(), method);
 
             if (type == null)
             {

@@ -23,7 +23,7 @@ public class SetProvider implements Provider
             return Collections.emptySet();
         }
 
-        final Type<?> type = context.getPath().getType().getGenerics().get(0);
+        final Type<?> type = context.getPath().getType().getGenerics().get(0).getType();
         return Collections.singleton(context.createChild("[0]", type));
     }
 }

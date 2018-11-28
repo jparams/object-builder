@@ -24,7 +24,7 @@ public class VectorProvider implements Provider
             return vector;
         }
 
-        final Type<?> type = context.getPath().getType().getGenerics().get(0);
+        final Type<?> type = context.getPath().getType().getGenerics().get(0).getType();
         vector.add(context.createChild("[0]", type));
         return vector;
     }

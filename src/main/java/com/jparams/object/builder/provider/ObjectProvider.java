@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import com.jparams.object.builder.BuildStrategy;
 import com.jparams.object.builder.Context;
+import com.jparams.object.builder.path.Path;
 import com.jparams.object.builder.type.Type;
 import com.jparams.object.builder.type.TypeMap;
 import com.jparams.object.builder.type.TypeResolver;
@@ -85,7 +86,7 @@ public class ObjectProvider implements Provider
         for (int i = 0; i < constructor.getParameters().length; i++)
         {
             final Parameter parameter = constructor.getParameters()[i];
-            final Type<?> type = TypeResolver.resolve(parameter);
+            final Type<?> type = TypeResolver.resolveParameterType(context.getPath(), parameter);
             arguments[i] = context.createChild(name + "[" + i + "]", type);
         }
 
@@ -131,19 +132,40 @@ public class ObjectProvider implements Provider
 
     private void injectFields(final Object object, final Context context)
     {
-        for (final Field field : ObjectUtils.getFields(object.getClass()))
+        Path path = context.getPath();
+
+        while (true)
         {
-            try
+            final Class<?> clazz = path.getType().getJavaType();
+
+            for (final Field field : clazz.getDeclaredFields())
             {
-                final Type<?> type = TypeResolver.resolve(field);
-                final Object instance = context.createChild(field.getName(), type);
-                field.setAccessible(true);
-                field.set(object, instance);
+                if (Modifier.isStatic(field.getModifiers()))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    final Type<?> type = TypeResolver.resolveFieldType(path, field);
+                    final Object instance = context.createChild(field.getName(), type);
+                    field.setAccessible(true);
+                    field.set(object, instance);
+                }
+                catch (final Exception e)
+                {
+                    context.logError("Failed to inject field [" + field.getName() + "]", e);
+                }
             }
-            catch (final Exception e)
+
+            final Type<?> superClass = TypeResolver.resolveType(path, clazz.getGenericSuperclass());
+
+            if (superClass == null)
             {
-                context.logError("Failed to inject field [" + field.getName() + "]", e);
+                return;
             }
+
+            path = new Path("$super", superClass, path);
         }
     }
 }

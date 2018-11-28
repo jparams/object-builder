@@ -1,10 +1,12 @@
 package com.jparams.object.builder.type;
 
+import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.jparams.object.builder.utils.CollectionUtils;
 
@@ -14,9 +16,9 @@ import com.jparams.object.builder.utils.CollectionUtils;
 public class Type<T>
 {
     private final Class<T> javaType;
-    private final List<Type<?>> generics;
+    private final List<Generic> generics;
 
-    Type(final Class<T> javaType, final List<Type<?>> generics)
+    Type(final Class<T> javaType, final List<Generic> generics)
     {
         this.javaType = javaType;
         this.generics = CollectionUtils.unmodifiableCopy(generics);
@@ -27,7 +29,7 @@ public class Type<T>
         return javaType;
     }
 
-    public List<Type<?>> getGenerics()
+    public List<Generic> getGenerics()
     {
         return generics;
     }
@@ -45,13 +47,25 @@ public class Type<T>
      *     Type.forClass(Map.class).withGenerics(Arrays.asList(Type.forClass(String.class), Type.forClass(List.class).withGenerics(String.class)))
      * </pre>
      *
-     * @param generics generics
+     * @param genericTypes generic types
      * @return type with generics
      * @throws IllegalArgumentException thrown when to many or too few generics provided
      */
-    public Type<T> withGenerics(final List<Type<?>> generics) throws IllegalArgumentException
+    public Type<T> withGenerics(final List<Type<?>> genericTypes) throws IllegalArgumentException
     {
-        validateGenerics(generics);
+        final List<String> aliases = Arrays.stream(javaType.getTypeParameters())
+                                           .map(TypeVariable::getName)
+                                           .collect(Collectors.toList());
+
+        if (aliases.size() != genericTypes.size())
+        {
+            throw new IllegalArgumentException("Expected " + aliases.size() + " generics, got " + genericTypes.size());
+        }
+
+        final List<Generic> generics = IntStream.range(0, aliases.size())
+                                                .mapToObj(i -> new Generic(aliases.get(i), genericTypes.get(i)))
+                                                .collect(Collectors.toList());
+
         return new Type<>(javaType, generics);
     }
 
@@ -95,16 +109,6 @@ public class Type<T>
         return withGenerics(Arrays.stream(generics).map(Type::forClass).collect(Collectors.toList()));
     }
 
-    private void validateGenerics(final List<Type<?>> generics)
-    {
-        final int expectedSize = javaType.getTypeParameters().length;
-
-        if (generics.size() != expectedSize)
-        {
-            throw new IllegalArgumentException("Expected " + expectedSize + " generics, got " + generics.size());
-        }
-    }
-
     @Override
     public boolean equals(final Object other)
     {
@@ -138,5 +142,18 @@ public class Type<T>
     public static <T> Type<T> forClass(final Class<T> clazz)
     {
         return new Type<>(clazz, Collections.emptyList());
+    }
+
+    @Override
+    public String toString()
+    {
+        final String simpleName = javaType.getSimpleName();
+
+        if (generics.isEmpty())
+        {
+            return simpleName;
+        }
+
+        return simpleName + "<" + generics.stream().map(Generic::toString).reduce((o1, o2) -> o1 + ", " + o2).orElse("") + ">";
     }
 }

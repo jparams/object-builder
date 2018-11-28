@@ -32,7 +32,7 @@ public abstract class TypeReference<T>
 
             if (types.length > 0)
             {
-                @SuppressWarnings("unchecked") final Type<T> resolvedType = (Type<T>) TypeResolver.resolve(types[0]);
+                @SuppressWarnings("unchecked") final Type<T> resolvedType = (Type<T>) TypeResolver.resolveType(types[0]);
                 return resolvedType;
             }
         }

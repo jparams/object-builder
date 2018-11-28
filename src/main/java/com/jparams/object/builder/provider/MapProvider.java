@@ -23,8 +23,8 @@ public class MapProvider implements Provider
             return Collections.emptyMap();
         }
 
-        final Type<?> keyType = context.getPath().getType().getGenerics().get(0);
-        final Type<?> valueType = context.getPath().getType().getGenerics().get(1);
+        final Type<?> keyType = context.getPath().getType().getGenerics().get(0).getType();
+        final Type<?> valueType = context.getPath().getType().getGenerics().get(1).getType();
         final Object key = context.createChild("[0.key]", keyType);
         final Object value = context.createChild("[0.value]", valueType);
         return Collections.singletonMap(key, value);

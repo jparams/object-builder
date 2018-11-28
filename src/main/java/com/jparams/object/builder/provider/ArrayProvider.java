@@ -18,7 +18,7 @@ public class ArrayProvider implements Provider
     public Object[] provide(final Context context)
     {
         final Class<?> componentType = context.getPath().getType().getJavaType().getComponentType();
-        final Type<?> type = TypeResolver.resolve(componentType);
+        final Type<?> type = TypeResolver.resolveType(context.getPath(), componentType);
         final Object[] array = (Object[]) Array.newInstance(componentType, 1);
         array[0] = context.createChild("[0]", type);
         return array;

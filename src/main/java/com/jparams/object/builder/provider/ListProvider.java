@@ -23,7 +23,7 @@ public class ListProvider implements Provider
             return Collections.emptyList();
         }
 
-        final Type<?> type = context.getPath().getType().getGenerics().get(0);
+        final Type<?> type = context.getPath().getType().getGenerics().get(0).getType();
         final Object child = context.createChild("[0]", type);
         return Collections.singletonList(child);
     }

@@ -32,18 +32,17 @@ public class TypeTest
     {
         final Type<List> type = Type.forClass(List.class).withGenerics(String.class);
         assertThat(type.getJavaType()).isEqualTo(List.class);
-        assertThat(type.getGenerics()).containsExactly(Type.forClass(String.class));
+        assertThat(type.getGenerics()).containsExactly(new Generic("E", Type.forClass(String.class)));
     }
 
     @Test
     public void testCreateForClassWithGenericsWithinGenerics()
     {
         final Type<List> type = Type.forClass(List.class)
-                                    .withGenerics(Type.forClass(List.class)
-                                                      .withGenerics(String.class));
+                                    .withGenerics(Type.forClass(List.class).withGenerics(String.class));
 
         assertThat(type.getJavaType()).isEqualTo(List.class);
-        assertThat(type.getGenerics()).containsExactly(Type.forClass(List.class).withGenerics(String.class));
+        assertThat(type.getGenerics()).containsExactly(new Generic("E", new Type<>(List.class, Collections.singletonList(new Generic("E", new Type<>(String.class, null))))));
     }
 
     @Test
@@ -51,7 +50,7 @@ public class TypeTest
     {
         final Type<Map> type = Type.forClass(Map.class).withGenerics(Integer.class, String.class);
         assertThat(type.getJavaType()).isEqualTo(Map.class);
-        assertThat(type.getGenerics()).containsExactly(Type.forClass(Integer.class), Type.forClass(String.class));
+        assertThat(type.getGenerics()).containsExactly(new Generic("K", new Type<>(Integer.class, null)), new Generic("V", new Type<>(String.class, null)));
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -60,8 +60,8 @@ public class SortedMapProviderTest
 
         assertThat((SortedMap) provided).containsEntry("abc", "abc");
 
-        verify(mockContext).createChild("[0.key]", type.getGenerics().get(0));
-        verify(mockContext).createChild("[0.value]", type.getGenerics().get(1));
+        verify(mockContext).createChild("[0.key]", type.getGenerics().get(0).getType());
+        verify(mockContext).createChild("[0.value]", type.getGenerics().get(1).getType());
 
     }
 }
