@@ -1,4 +1,4 @@
-package com.jparams.object.builder.utils;
+package com.jparams.object.builder.util;
 
 import java.lang.reflect.Field;
 

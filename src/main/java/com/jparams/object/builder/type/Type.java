@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.jparams.object.builder.utils.CollectionUtils;
+import com.jparams.object.builder.util.CollectionUtils;
 
 /**
  * A Type is an internal representation of a Java type, optionally with a list of generic types defined.

@@ -14,7 +14,7 @@ import com.jparams.object.builder.path.Path;
 import com.jparams.object.builder.type.Type;
 import com.jparams.object.builder.type.TypeMap;
 import com.jparams.object.builder.type.TypeResolver;
-import com.jparams.object.builder.utils.ObjectUtils;
+import com.jparams.object.builder.util.ObjectUtils;
 
 public class ObjectProvider implements Provider
 {

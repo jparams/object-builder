@@ -1,5 +1,7 @@
 package com.jparams.object.builder.utils;
 
+import com.jparams.object.builder.util.ObjectUtils;
+
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

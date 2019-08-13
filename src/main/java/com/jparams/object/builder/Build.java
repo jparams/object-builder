@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import com.jparams.object.builder.issue.Issue;
 import com.jparams.object.builder.issue.IssueType;
-import com.jparams.object.builder.utils.CollectionUtils;
+import com.jparams.object.builder.util.CollectionUtils;
 
 public class Build<T>
 {

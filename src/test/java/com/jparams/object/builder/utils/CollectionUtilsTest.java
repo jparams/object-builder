@@ -3,6 +3,8 @@ package com.jparams.object.builder.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jparams.object.builder.util.CollectionUtils;
+
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

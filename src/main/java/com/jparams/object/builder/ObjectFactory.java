@@ -6,7 +6,7 @@ import com.jparams.object.builder.issue.IssueLogger;
 import com.jparams.object.builder.path.Path;
 import com.jparams.object.builder.path.PathFilter;
 import com.jparams.object.builder.provider.Provider;
-import com.jparams.object.builder.utils.CollectionUtils;
+import com.jparams.object.builder.util.CollectionUtils;
 
 class ObjectFactory
 {

@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 
 import com.jparams.object.builder.Context;
 import com.jparams.object.builder.type.Type;
-import com.jparams.object.builder.utils.CollectionUtils;
+import com.jparams.object.builder.util.CollectionUtils;
 
 /**
  * Caches and returns the same value of a known {@link Type}
