@@ -21,6 +21,7 @@ import com.jparams.object.builder.provider.DequeProvider;
 import com.jparams.object.builder.provider.DoubleProvider;
 import com.jparams.object.builder.provider.EnumProvider;
 import com.jparams.object.builder.provider.FloatProvider;
+import com.jparams.object.builder.provider.InstantProvider;
 import com.jparams.object.builder.provider.IntegerProvider;
 import com.jparams.object.builder.provider.InterfaceProvider;
 import com.jparams.object.builder.provider.ListProvider;
@@ -318,6 +319,7 @@ public final class Configuration
         providers.add(new LocalTimeProvider());
         providers.add(new ZonedDateTimeProvider());
         providers.add(new OffsetDateTimeProvider());
+        providers.add(new InstantProvider());
         providers.add(new LongProvider());
         providers.add(new MapProvider());
         providers.add(new SortedMapProvider());
